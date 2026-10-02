@@ -269,6 +269,8 @@ class InvitationApp {
       } else {
         return 'Famille Ourahmoune (Direct)';
       }
+    } else if (p.category === 'Belle Famille') {
+      return 'Belle Famille (Izri)';
     } else if (p.category === 'Voisins') {
       return p.familyName ? `Voisins (${p.familyName})` : 'Voisins';
     } else if (p.category === 'Amis') {
@@ -363,6 +365,8 @@ class InvitationApp {
     // Category pills badges
     document.getElementById('cat-badge-all').textContent = counts.total;
     document.getElementById('cat-badge-famille').textContent = categories['Famille'] || 0;
+    const catBelleBadge = document.getElementById('cat-badge-belle');
+    if (catBelleBadge) catBelleBadge.textContent = categories['Belle Famille'] || 0;
     document.getElementById('cat-badge-voisins').textContent = categories['Voisins'] || 0;
     document.getElementById('cat-badge-amis').textContent = categories['Amis'] || 0;
 

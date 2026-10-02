@@ -1,12 +1,12 @@
 /**
- * Streamlined Store for Invitation Tracking (v4.1 with Accurate Hierarchy)
+ * Streamlined Store for Invitation Tracking (v5 with Belle Famille)
  */
 
 import { GoogleSheetSync } from './googleSync.js';
 import { INITIAL_SPREADSHEET_PEOPLE } from './defaultPeople.js';
 
-const STORAGE_KEY_PEOPLE = 'invitrack_people_v4_fixed';
-const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v4';
+const STORAGE_KEY_PEOPLE = 'invitrack_people_v5';
+const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v5';
 
 class Store {
   constructor() {
@@ -24,9 +24,9 @@ class Store {
       return [...INITIAL_SPREADSHEET_PEOPLE];
     }
     try {
-      let parsed = JSON.parse(raw);
-      parsed = parsed.filter(p => p.category !== 'Belle Famille');
-      if (parsed.length === 0 || !parsed[0].hasOwnProperty('branch')) {
+      const parsed = JSON.parse(raw);
+      // Auto-migrate if Belle Famille was missing
+      if (parsed.length < 250 || !parsed.some(p => p.category === 'Belle Famille')) {
         localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
         return [...INITIAL_SPREADSHEET_PEOPLE];
       }
@@ -90,11 +90,11 @@ class Store {
 
     const categories = {
       'Famille': this.people.filter(p => p.category === 'Famille').length,
+      'Belle Famille': this.people.filter(p => p.category === 'Belle Famille').length,
       'Voisins': this.people.filter(p => p.category === 'Voisins').length,
       'Amis': this.people.filter(p => p.category === 'Amis').length
     };
 
-    // Correct branch & sub-family mapping
     const branches = {};
     this.people.filter(p => p.category === 'Famille').forEach(p => {
       let b = '';
