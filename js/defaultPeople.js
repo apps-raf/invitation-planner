@@ -1,12 +1,16 @@
 /**
- * Preloaded guests from f5f2bf51.xlsx
+ * Preloaded guests from f5f2bf51.xlsx with enriched hierarchy
  */
 
 export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_1",
     "name": "Mahdjouba Ourahmoune",
+    "firstName": "Mahdjouba",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "",
+    "gender": "",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -14,495 +18,743 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_2",
     "name": "Salima Ourahmoune",
+    "firstName": "Salima",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_3",
     "name": "Femme à Zine-eddine Ourahmoune",
+    "firstName": "Femme à Zine-eddine",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_4",
     "name": "Houria Ourahmoune",
+    "firstName": "Houria",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_5",
     "name": "Nadia Ourahmoune",
+    "firstName": "Nadia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_6",
     "name": "Lila Ourahmoune",
+    "firstName": "Lila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_7",
     "name": "Salim Ourahmoune",
+    "firstName": "Salim",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_8",
     "name": "Zine-eddine Ourahmoune",
+    "firstName": "Zine-eddine",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_9",
     "name": "Rabah Ourahmoune",
+    "firstName": "Rabah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_10",
     "name": "Saber Ourahmoune",
+    "firstName": "Saber",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_11",
     "name": "Mohand Ourahmoune",
+    "firstName": "Mohand",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bouzid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bouzid"
+    "comment": ""
   },
   {
     "id": "p_12",
     "name": "Zakia Ourahmoune",
+    "firstName": "Zakia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_13",
     "name": "Khalida Ourahmoune",
+    "firstName": "Khalida",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_14",
     "name": "Anissa Ourahmoune",
+    "firstName": "Anissa",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_15",
     "name": "Faïza Ourahmoune",
+    "firstName": "Faïza",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_16",
     "name": "Lamia Ourahmoune",
+    "firstName": "Lamia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_17",
     "name": "Safia Ourahmoune",
+    "firstName": "Safia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_18",
     "name": "Saliha Ourahmoune",
+    "firstName": "Saliha",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_19",
     "name": "Ilham Ourahmoune",
+    "firstName": "Ilham",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_20",
     "name": "Ghanou Ourahmoune",
+    "firstName": "Ghanou",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_21",
     "name": "Halim Ourahmoune",
+    "firstName": "Halim",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_22",
     "name": "Samir Ourahmoune",
+    "firstName": "Samir",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_23",
     "name": "Mahfoud Ourahmoune",
+    "firstName": "Mahfoud",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_24",
     "name": "Mourad Ourahmoune",
+    "firstName": "Mourad",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Daoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Daoud"
+    "comment": ""
   },
   {
     "id": "p_25",
     "name": "Zohra Ourahmoune",
+    "firstName": "Zohra",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_26",
     "name": "Zineb Ourahmoune",
+    "firstName": "Zineb",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_27",
     "name": "Kenza Ourahmoune",
+    "firstName": "Kenza",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_28",
     "name": "Aldjia Ourahmoune",
+    "firstName": "Aldjia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_29",
     "name": "Assia Ourahmoune",
+    "firstName": "Assia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_30",
     "name": "Faïza Ourahmoune",
+    "firstName": "Faïza",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_31",
     "name": "Ghania Ourahmoune",
+    "firstName": "Ghania",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_32",
     "name": "Hichem Ourahmoune",
+    "firstName": "Hichem",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_33",
     "name": "Ramdane Ourahmoune",
+    "firstName": "Ramdane",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_34",
     "name": "Boussaad Ourahmoune",
+    "firstName": "Boussaad",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_35",
     "name": "Mbarek Ourahmoune",
+    "firstName": "Mbarek",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Farid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Farid"
+    "comment": ""
   },
   {
     "id": "p_36",
     "name": "Fatiha Ourahmoune",
+    "firstName": "Fatiha",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_37",
     "name": "Yassmina Ourahmoune",
+    "firstName": "Yassmina",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_38",
     "name": "Soumeya Ourahmoune",
+    "firstName": "Soumeya",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_39",
     "name": "Nariman Ourahmoune",
+    "firstName": "Nariman",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_40",
     "name": "Nadia (Femme Hassen) Ourahmoune",
+    "firstName": "Nadia (Femme Hassen)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_41",
     "name": "Rezki Ourahmoune",
+    "firstName": "Rezki",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_42",
     "name": "Hmidouche Ourahmoune",
+    "firstName": "Hmidouche",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_43",
     "name": "Sofiane Ourahmoune",
+    "firstName": "Sofiane",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_44",
     "name": "Djamal (Frère à Soumeya) Ourahmoune",
+    "firstName": "Djamal (Frère à Soumeya)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_45",
     "name": "Hassan Ourahmoune",
+    "firstName": "Hassan",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fatiha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fatiha"
+    "comment": ""
   },
   {
     "id": "p_46",
     "name": "Yamina Ourahmoune",
+    "firstName": "Yamina",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_47",
     "name": "Wassila Ourahmoune",
+    "firstName": "Wassila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_48",
     "name": "Amal Ourahmoune",
+    "firstName": "Amal",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_49",
     "name": "Meriem Ourahmoune",
+    "firstName": "Meriem",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_50",
     "name": "Hadjar Ourahmoune",
+    "firstName": "Hadjar",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_51",
     "name": "Maman 1 Ourahmoune",
+    "firstName": "Maman 1",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_52",
     "name": "Maman 2 Ourahmoune",
+    "firstName": "Maman 2",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_53",
     "name": "Saïd Ourahmoune",
+    "firstName": "Saïd",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_54",
     "name": "Mehdi Ourahmoune",
+    "firstName": "Mehdi",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_55",
     "name": "Zaki Ourahmoune",
+    "firstName": "Zaki",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Saïd",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Saïd"
+    "comment": ""
   },
   {
     "id": "p_56",
     "name": "Nabila Ourahmoune",
+    "firstName": "Nabila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_57",
     "name": "Nadja Ourahmoune",
+    "firstName": "Nadja",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_58",
     "name": "Syrie Ourahmoune",
+    "firstName": "Syrie",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_59",
     "name": "Nassima Ourahmoune",
+    "firstName": "Nassima",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_60",
     "name": "Yazid Ourahmoune",
+    "firstName": "Yazid",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_61",
     "name": "Nasser Ourahmoune",
+    "firstName": "Nasser",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_62",
     "name": "Hamid Ourahmoune",
+    "firstName": "Hamid",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yazid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yazid"
+    "comment": ""
   },
   {
     "id": "p_63",
     "name": "Zakia Temmani",
+    "firstName": "Zakia",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -510,7 +762,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_64",
     "name": "Femme de Hamza Temmani",
+    "firstName": "Femme de Hamza",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -518,7 +774,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_65",
     "name": "Fille Lakhdar Temmani",
+    "firstName": "Fille Lakhdar",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -526,7 +786,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_66",
     "name": "Femme Lakhdar Temmani",
+    "firstName": "Femme Lakhdar",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -534,7 +798,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_67",
     "name": "Hamza Temmani",
+    "firstName": "Hamza",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -542,7 +810,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_68",
     "name": "Houssem Temmani",
+    "firstName": "Houssem",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -550,7 +822,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_69",
     "name": "Mari Zakia Temmani",
+    "firstName": "Mari Zakia",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -558,7 +834,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_70",
     "name": "Tarek Temmani",
+    "firstName": "Tarek",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -566,7 +846,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_71",
     "name": "Lakhdar Temmani",
+    "firstName": "Lakhdar",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -574,7 +858,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_72",
     "name": "Mari fille lakhdar Temmani",
+    "firstName": "Mari fille lakhdar",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -582,7 +870,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_73",
     "name": "Temmani #1",
+    "firstName": "#1",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -590,7 +882,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_74",
     "name": "Temmani #2",
+    "firstName": "#2",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -598,7 +894,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_75",
     "name": "Temmani #3",
+    "firstName": "#3",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -606,7 +906,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_76",
     "name": "Temmani #4",
+    "firstName": "#4",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -614,7 +918,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_77",
     "name": "Temmani #5",
+    "firstName": "#5",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -622,7 +930,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_78",
     "name": "Temmani #6",
+    "firstName": "#6",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -630,7 +942,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_79",
     "name": "Temmani #7",
+    "firstName": "#7",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -638,7 +954,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_80",
     "name": "Temmani #8",
+    "firstName": "#8",
+    "familyName": "Temmani",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -646,7 +966,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_81",
     "name": "Izri #1",
+    "firstName": "#1",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -654,7 +978,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_82",
     "name": "Izri #2",
+    "firstName": "#2",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -662,7 +990,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_83",
     "name": "Izri #3",
+    "firstName": "#3",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -670,7 +1002,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_84",
     "name": "Izri #4",
+    "firstName": "#4",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -678,7 +1014,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_85",
     "name": "Izri #5",
+    "firstName": "#5",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -686,7 +1026,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_86",
     "name": "Izri #6",
+    "firstName": "#6",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -694,7 +1038,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_87",
     "name": "Izri #7",
+    "firstName": "#7",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -702,7 +1050,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_88",
     "name": "Izri #8",
+    "firstName": "#8",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -710,7 +1062,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_89",
     "name": "Izri #9",
+    "firstName": "#9",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -718,7 +1074,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_90",
     "name": "Izri #10",
+    "firstName": "#10",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -726,7 +1086,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_91",
     "name": "Izri #11",
+    "firstName": "#11",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -734,7 +1098,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_92",
     "name": "Izri #12",
+    "firstName": "#12",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -742,7 +1110,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_93",
     "name": "Izri #13",
+    "firstName": "#13",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -750,7 +1122,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_94",
     "name": "Izri #14",
+    "firstName": "#14",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -758,7 +1134,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_95",
     "name": "Izri #15",
+    "firstName": "#15",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -766,7 +1146,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_96",
     "name": "Izri #16",
+    "firstName": "#16",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -774,7 +1158,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_97",
     "name": "Izri #17",
+    "firstName": "#17",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -782,7 +1170,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_98",
     "name": "Izri #18",
+    "firstName": "#18",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -790,7 +1182,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_99",
     "name": "Izri #19",
+    "firstName": "#19",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -798,7 +1194,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_100",
     "name": "Izri #20",
+    "firstName": "#20",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -806,7 +1206,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_101",
     "name": "Izri #21",
+    "firstName": "#21",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -814,7 +1218,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_102",
     "name": "Izri #22",
+    "firstName": "#22",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -822,7 +1230,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_103",
     "name": "Izri #23",
+    "firstName": "#23",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -830,7 +1242,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_104",
     "name": "Izri #24",
+    "firstName": "#24",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -838,7 +1254,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_105",
     "name": "Izri #25",
+    "firstName": "#25",
+    "familyName": "Izri",
     "category": "Belle Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -846,7 +1266,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_106",
     "name": "Ouardia Ihaddaden",
+    "firstName": "Ouardia",
+    "familyName": "Ihaddaden",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -854,7 +1278,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_107",
     "name": "Fadéla Ihaddaden",
+    "firstName": "Fadéla",
+    "familyName": "Ihaddaden",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -862,7 +1290,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_108",
     "name": "Fazia Ihaddaden",
+    "firstName": "Fazia",
+    "familyName": "Ihaddaden",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -870,7 +1302,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_109",
     "name": "Sabeha Seddik",
+    "firstName": "Sabeha",
+    "familyName": "Seddik",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -878,7 +1314,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_110",
     "name": "Maman de Sabeha Seddik",
+    "firstName": "Maman de Sabeha",
+    "familyName": "Seddik",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -886,7 +1326,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_111",
     "name": "Père de Sabeha Seddik",
+    "firstName": "Père de Sabeha",
+    "familyName": "Seddik",
     "category": "Amis",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -894,7 +1338,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_112",
     "name": "Frère de Sabeha Seddik",
+    "firstName": "Frère de Sabeha",
+    "familyName": "Seddik",
     "category": "Amis",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -902,7 +1350,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_113",
     "name": "Mme Sellami Sellami",
+    "firstName": "Mme Sellami",
+    "familyName": "Sellami",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -910,7 +1362,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_114",
     "name": "Mari Sellami Sellami",
+    "firstName": "Mari Sellami",
+    "familyName": "Sellami",
     "category": "Amis",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -918,7 +1374,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_115",
     "name": "Hakima Tabti",
+    "firstName": "Hakima",
+    "familyName": "Tabti",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -926,7 +1386,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_116",
     "name": "Samia Tabti",
+    "firstName": "Samia",
+    "familyName": "Tabti",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -934,7 +1398,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_117",
     "name": "Hiba",
+    "firstName": "Hiba",
+    "familyName": "",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -942,7 +1410,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_118",
     "name": "Ouahiba",
+    "firstName": "Ouahiba",
+    "familyName": "",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -950,7 +1422,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_119",
     "name": "Mourad (Mari Hiba)",
+    "firstName": "Mourad (Mari Hiba)",
+    "familyName": "",
     "category": "Amis",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -958,327 +1434,491 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_120",
     "name": "Saïda Ourahmoune",
+    "firstName": "Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fodil",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fodil"
+    "comment": ""
   },
   {
     "id": "p_121",
     "name": "Fodil Ourahmoune",
+    "firstName": "Fodil",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Fodil",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Fodil"
+    "comment": ""
   },
   {
     "id": "p_122",
     "name": "Akila Ourahmoune",
+    "firstName": "Akila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_123",
     "name": "Saïda Ourahmoune",
+    "firstName": "Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_124",
     "name": "Farida Ourahmoune",
+    "firstName": "Farida",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_125",
     "name": "Nora Ourahmoune",
+    "firstName": "Nora",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_126",
     "name": "Nawal Ourahmoune",
+    "firstName": "Nawal",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_127",
     "name": "Roukaya Ourahmoune",
+    "firstName": "Roukaya",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_128",
     "name": "Chouaïb Ourahmoune",
+    "firstName": "Chouaïb",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_129",
     "name": "Nasser-eddine Ourahmoune",
+    "firstName": "Nasser-eddine",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Hamid (Voisin)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Hamid (Voisin)"
+    "comment": ""
   },
   {
     "id": "p_130",
     "name": "Sarah Ourahmoune",
+    "firstName": "Sarah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_131",
     "name": "Wassila Ourahmoune",
+    "firstName": "Wassila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_132",
     "name": "Linda Ourahmoune",
+    "firstName": "Linda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_133",
     "name": "Messaoud Ourahmoune",
+    "firstName": "Messaoud",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_134",
     "name": "Nabil Ourahmoune",
+    "firstName": "Nabil",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_135",
     "name": "Redouane Ourahmoune",
+    "firstName": "Redouane",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_136",
     "name": "Farouk Ourahmoune",
+    "firstName": "Farouk",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_137",
     "name": "Nassim Ourahmoune",
+    "firstName": "Nassim",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_138",
     "name": "Azzedine (Mari de Linda) Ourahmoune",
+    "firstName": "Azzedine (Mari de Linda)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Messaoud",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Messaoud"
+    "comment": ""
   },
   {
     "id": "p_139",
     "name": "Malika Ourahmoune",
+    "firstName": "Malika",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mouloud Rabah",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mouloud Rabah"
+    "comment": ""
   },
   {
     "id": "p_140",
     "name": "Rabah Ourahmoune",
+    "firstName": "Rabah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mouloud Rabah",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mouloud Rabah"
+    "comment": ""
   },
   {
     "id": "p_141",
     "name": "Abdel Rahim Ourahmoune",
+    "firstName": "Abdel Rahim",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mouloud Rabah",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mouloud Rabah"
+    "comment": ""
   },
   {
     "id": "p_142",
     "name": "Rabéa Ourahmoune",
+    "firstName": "Rabéa",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Rabéa",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Rabéa"
+    "comment": ""
   },
   {
     "id": "p_143",
     "name": "Saïda Ourahmoune",
+    "firstName": "Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Rabéa",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Rabéa"
+    "comment": ""
   },
   {
     "id": "p_144",
     "name": "Akila Ourahmoune",
+    "firstName": "Akila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Rabéa",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Rabéa"
+    "comment": ""
   },
   {
     "id": "p_145",
     "name": "Mari de Saïda Ourahmoune",
+    "firstName": "Mari de Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Rabéa",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Rabéa"
+    "comment": ""
   },
   {
     "id": "p_146",
     "name": "Assia Ourahmoune",
+    "firstName": "Assia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sakina",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sakina"
+    "comment": ""
   },
   {
     "id": "p_147",
     "name": "Rachid Ourahmoune",
+    "firstName": "Rachid",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sakina",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sakina"
+    "comment": ""
   },
   {
     "id": "p_148",
     "name": "Ghania Ourahmoune",
+    "firstName": "Ghania",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sghir",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sghir"
+    "comment": ""
   },
   {
     "id": "p_149",
     "name": "Louiza Ourahmoune",
+    "firstName": "Louiza",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sghir",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sghir"
+    "comment": ""
   },
   {
     "id": "p_150",
     "name": "Saïda Ourahmoune",
+    "firstName": "Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Wahib",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Wahib"
+    "comment": ""
   },
   {
     "id": "p_151",
     "name": "Wahib Ourahmoune",
+    "firstName": "Wahib",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Wahib",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Wahib"
+    "comment": ""
   },
   {
     "id": "p_152",
     "name": "Yamina Ourahmoune",
+    "firstName": "Yamina",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yamina",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yamina"
+    "comment": ""
   },
   {
     "id": "p_153",
     "name": "Salah Ourahmoune",
+    "firstName": "Salah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yamina",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yamina"
+    "comment": ""
   },
   {
     "id": "p_154",
     "name": "Abdel Raouf Ourahmoune",
+    "firstName": "Abdel Raouf",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Yamina",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Yamina"
+    "comment": ""
   },
   {
     "id": "p_155",
     "name": "Amira Ourahmoune",
+    "firstName": "Amira",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Braham)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Braham)"
+    "comment": ""
   },
   {
     "id": "p_156",
     "name": "Braham Ourahmoune",
+    "firstName": "Braham",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Braham)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Braham)"
+    "comment": ""
   },
   {
     "id": "p_157",
     "name": "Hamza Ourahmoune",
+    "firstName": "Hamza",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Braham)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Braham)"
+    "comment": ""
   },
   {
     "id": "p_158",
     "name": "Oussama Ourahmoune",
+    "firstName": "Oussama",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Braham)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Braham)"
+    "comment": ""
   },
   {
     "id": "p_159",
     "name": "Fatma-Zohra Ourahmoune",
+    "firstName": "Fatma-Zohra",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Femme)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Femme)"
+    "comment": ""
   },
   {
     "id": "p_160",
     "name": "Mme Belalem Belalem",
+    "firstName": "Mme Belalem",
+    "familyName": "Belalem",
     "category": "Amis",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1286,7 +1926,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_161",
     "name": "Mari de Belalem Belalem",
+    "firstName": "Mari de Belalem",
+    "familyName": "Belalem",
     "category": "Amis",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1294,7 +1938,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_162",
     "name": "Lamis Guemar",
+    "firstName": "Lamis",
+    "familyName": "Guemar",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1302,7 +1950,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_163",
     "name": "Hassina Guemar",
+    "firstName": "Hassina",
+    "familyName": "Guemar",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1310,7 +1962,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_164",
     "name": "Toufik Guemar",
+    "firstName": "Toufik",
+    "familyName": "Guemar",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1318,7 +1974,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_165",
     "name": "Rabah Guemar",
+    "firstName": "Rabah",
+    "familyName": "Guemar",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1326,7 +1986,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_166",
     "name": "Mansour Guemar",
+    "firstName": "Mansour",
+    "familyName": "Guemar",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1334,383 +1998,575 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_167",
     "name": "Farida Ourahmoune",
+    "firstName": "Farida",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Ayachi",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Ayachi"
+    "comment": ""
   },
   {
     "id": "p_168",
     "name": "Ayachi Ourahmoune",
+    "firstName": "Ayachi",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Ayachi",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Ayachi"
+    "comment": ""
   },
   {
     "id": "p_169",
     "name": "Yassmina Ourahmoune",
+    "firstName": "Yassmina",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bounouar",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bounouar"
+    "comment": ""
   },
   {
     "id": "p_170",
     "name": "Naceira Ourahmoune",
+    "firstName": "Naceira",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bounouar",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bounouar"
+    "comment": ""
   },
   {
     "id": "p_171",
     "name": "Oum-hani Ourahmoune",
+    "firstName": "Oum-hani",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bounouar",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bounouar"
+    "comment": ""
   },
   {
     "id": "p_172",
     "name": "Toufik Ourahmoune",
+    "firstName": "Toufik",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bounouar",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bounouar"
+    "comment": ""
   },
   {
     "id": "p_173",
     "name": "Nadjib Ourahmoune",
+    "firstName": "Nadjib",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Bounouar",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Bounouar"
+    "comment": ""
   },
   {
     "id": "p_174",
     "name": "Sonia Ourahmoune",
+    "firstName": "Sonia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Faïçal",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Faïçal"
+    "comment": ""
   },
   {
     "id": "p_175",
     "name": "Faïçal Ourahmoune",
+    "firstName": "Faïçal",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Faïçal",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Faïçal"
+    "comment": ""
   },
   {
     "id": "p_176",
     "name": "Zahwa Ourahmoune",
+    "firstName": "Zahwa",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_177",
     "name": "Fella (Femme Hmana) Ourahmoune",
+    "firstName": "Fella (Femme Hmana)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_178",
     "name": "Souhila Ourahmoune",
+    "firstName": "Souhila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_179",
     "name": "Samir Ourahmoune",
+    "firstName": "Samir",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_180",
     "name": "Hmana Ourahmoune",
+    "firstName": "Hmana",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_181",
     "name": "Abdel-rezak Ourahmoune",
+    "firstName": "Abdel-rezak",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_182",
     "name": "Sofiane Ourahmoune",
+    "firstName": "Sofiane",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Madjid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Madjid"
+    "comment": ""
   },
   {
     "id": "p_183",
     "name": "Chafia Ourahmoune",
+    "firstName": "Chafia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mustapha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mustapha"
+    "comment": ""
   },
   {
     "id": "p_184",
     "name": "Sa fille Ourahmoune",
+    "firstName": "Sa fille",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mustapha",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mustapha"
+    "comment": ""
   },
   {
     "id": "p_185",
     "name": "Gendre Ourahmoune",
+    "firstName": "Gendre",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Mustapha",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Mustapha"
+    "comment": ""
   },
   {
     "id": "p_186",
     "name": "Samia Ourahmoune",
+    "firstName": "Samia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sadak",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sadak"
+    "comment": ""
   },
   {
     "id": "p_187",
     "name": "Sadak Ourahmoune",
+    "firstName": "Sadak",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sadak",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sadak"
+    "comment": ""
   },
   {
     "id": "p_188",
     "name": "Djalil Ourahmoune",
+    "firstName": "Djalil",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Sadak",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Sadak"
+    "comment": ""
   },
   {
     "id": "p_189",
     "name": "Ouardia Ourahmoune",
+    "firstName": "Ouardia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Salah",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Salah"
+    "comment": ""
   },
   {
     "id": "p_190",
     "name": "Salah Ourahmoune",
+    "firstName": "Salah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Salah",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Salah"
+    "comment": ""
   },
   {
     "id": "p_191",
     "name": "Fils de Salah Ourahmoune",
+    "firstName": "Fils de Salah",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Salah",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Salah"
+    "comment": ""
   },
   {
     "id": "p_192",
     "name": "Hadaa Ourahmoune",
+    "firstName": "Hadaa",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_193",
     "name": "Saïda Ourahmoune",
+    "firstName": "Saïda",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_194",
     "name": "Nadia Ourahmoune",
+    "firstName": "Nadia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_195",
     "name": "Hadjira Ourahmoune",
+    "firstName": "Hadjira",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_196",
     "name": "Karima Ourahmoune",
+    "firstName": "Karima",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_197",
     "name": "Rokaya Ourahmoune",
+    "firstName": "Rokaya",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_198",
     "name": "Hamida Ourahmoune",
+    "firstName": "Hamida",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_199",
     "name": "Belle mère Zoulikha Ourahmoune",
+    "firstName": "Belle mère Zoulikha",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_200",
     "name": "Djamal Ourahmoune",
+    "firstName": "Djamal",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_201",
     "name": "Tahar Ourahmoune",
+    "firstName": "Tahar",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_202",
     "name": "El-yamin Ourahmoune",
+    "firstName": "El-yamin",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_203",
     "name": "El-Hadi Ourahmoune",
+    "firstName": "El-Hadi",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_204",
     "name": "El Ouafi Ourahmoune",
+    "firstName": "El Ouafi",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_205",
     "name": "Riad Ourahmoune",
+    "firstName": "Riad",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_206",
     "name": "Fodhil (Mari de Hamida) Ourahmoune",
+    "firstName": "Fodhil (Mari de Hamida)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi Kheddou",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi Kheddou"
+    "comment": ""
   },
   {
     "id": "p_207",
     "name": "Ouahiba Ourahmoune",
+    "firstName": "Ouahiba",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Hakim)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Hakim)"
+    "comment": ""
   },
   {
     "id": "p_208",
     "name": "Hakim Ourahmoune",
+    "firstName": "Hakim",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Hakim)",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Hakim)"
+    "comment": ""
   },
   {
     "id": "p_209",
     "name": "Nabila Ourahmoune",
+    "firstName": "Nabila",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Kamel)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Kamel)"
+    "comment": ""
   },
   {
     "id": "p_210",
     "name": "Kamel Ourahmoune",
+    "firstName": "Kamel",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Kamel)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Kamel)"
+    "comment": ""
   },
   {
     "id": "p_211",
     "name": "Faïza (sa femme) Ourahmoune",
+    "firstName": "Faïza (sa femme)",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid (Mourad)",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid (Mourad)"
+    "comment": ""
   },
   {
     "id": "p_212",
     "name": "faycel Ourahmoune",
+    "firstName": "faycel",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid"
+    "comment": ""
   },
   {
     "id": "p_213",
     "name": "Sonia Ourahmoune",
+    "firstName": "Sonia",
+    "familyName": "Ourahmoune",
     "category": "Famille",
+    "branch": "Zi-Hamid",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Zi-Hamid"
+    "comment": ""
   },
   {
     "id": "p_214",
     "name": "Taous Abdel-Moumen",
+    "firstName": "Taous",
+    "familyName": "Abdel-Moumen",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1718,7 +2574,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_215",
     "name": "Fatma Abdel-Moumen",
+    "firstName": "Fatma",
+    "familyName": "Abdel-Moumen",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1726,7 +2586,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_216",
     "name": "Saliha Abdel-Moumen",
+    "firstName": "Saliha",
+    "familyName": "Abdel-Moumen",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1734,7 +2598,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_217",
     "name": "Lila Abdel-Moumen",
+    "firstName": "Lila",
+    "familyName": "Abdel-Moumen",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1742,7 +2610,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_218",
     "name": "Femme Ami Ali",
+    "firstName": "Femme",
+    "familyName": "Ami Ali",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1750,7 +2622,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_219",
     "name": "Mari Ami Ali",
+    "firstName": "Mari",
+    "familyName": "Ami Ali",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1758,7 +2634,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_220",
     "name": "Hayat Ami Saïd",
+    "firstName": "Hayat",
+    "familyName": "Ami Saïd",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1766,7 +2646,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_221",
     "name": "Djamel Ami Saïd",
+    "firstName": "Djamel",
+    "familyName": "Ami Saïd",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1774,7 +2658,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_222",
     "name": "Femme Chaabane Chaabane",
+    "firstName": "Femme Chaabane",
+    "familyName": "Chaabane",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1782,7 +2670,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_223",
     "name": "Boualem Chaabane",
+    "firstName": "Boualem",
+    "familyName": "Chaabane",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1790,7 +2682,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_224",
     "name": "Rosa Hmitouche",
+    "firstName": "Rosa",
+    "familyName": "Hmitouche",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1798,7 +2694,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_225",
     "name": "Lydia Hmitouche",
+    "firstName": "Lydia",
+    "familyName": "Hmitouche",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1806,7 +2706,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_226",
     "name": "Baya Hmitouche",
+    "firstName": "Baya",
+    "familyName": "Hmitouche",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1814,7 +2718,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_227",
     "name": "Youssef Hmitouche",
+    "firstName": "Youssef",
+    "familyName": "Hmitouche",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1822,7 +2730,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_228",
     "name": "Femme Mohand Ezzine",
+    "firstName": "Femme",
+    "familyName": "Mohand Ezzine",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1830,7 +2742,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_229",
     "name": "Mari Mohand Ezzine",
+    "firstName": "Mari",
+    "familyName": "Mohand Ezzine",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1838,7 +2754,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_230",
     "name": "Safia Obses",
+    "firstName": "Safia",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1846,7 +2766,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_231",
     "name": "Djazira Obses",
+    "firstName": "Djazira",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1854,7 +2778,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_232",
     "name": "Femme au Moustachou Obses",
+    "firstName": "Femme au Moustachou",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1862,7 +2790,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_233",
     "name": "Karim Obses",
+    "firstName": "Karim",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1870,7 +2802,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_234",
     "name": "Moustachou (Othmane) Obses",
+    "firstName": "Moustachou (Othmane)",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1878,7 +2814,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_235",
     "name": "Hmimi Obses",
+    "firstName": "Hmimi",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1886,7 +2826,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_236",
     "name": "Hamou Obses",
+    "firstName": "Hamou",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1894,7 +2838,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_237",
     "name": "Azouaou Obses",
+    "firstName": "Azouaou",
+    "familyName": "Obses",
     "category": "Voisins",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1902,7 +2850,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_238",
     "name": "Medjda Benaceur",
+    "firstName": "Medjda",
+    "familyName": "Benaceur",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1910,7 +2862,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_239",
     "name": "Mohamed Benaceur",
+    "firstName": "Mohamed",
+    "familyName": "Benaceur",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1918,7 +2874,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_240",
     "name": "Femme à Amir Benbouzid",
+    "firstName": "Femme à Amir",
+    "familyName": "Benbouzid",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1926,7 +2886,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_241",
     "name": "Amir Benbouzid",
+    "firstName": "Amir",
+    "familyName": "Benbouzid",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1934,7 +2898,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_242",
     "name": "Nouara Bouchafa",
+    "firstName": "Nouara",
+    "familyName": "Bouchafa",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1942,7 +2910,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_243",
     "name": "Nedjma Bouchafa",
+    "firstName": "Nedjma",
+    "familyName": "Bouchafa",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1950,7 +2922,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_244",
     "name": "Kenza Bouchafa",
+    "firstName": "Kenza",
+    "familyName": "Bouchafa",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1958,7 +2934,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_245",
     "name": "Lies (Fils de Karima) Bouchafa",
+    "firstName": "Lies (Fils de Karima)",
+    "familyName": "Bouchafa",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1966,7 +2946,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_246",
     "name": "Farida Bouikni",
+    "firstName": "Farida",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1974,7 +2958,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_247",
     "name": "Malika Bouikni",
+    "firstName": "Malika",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1982,7 +2970,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_248",
     "name": "Yamina Bouikni",
+    "firstName": "Yamina",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1990,7 +2982,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_249",
     "name": "Malika belle fille Seddik Bouikni",
+    "firstName": "Malika belle fille Seddik",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -1998,7 +2994,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_250",
     "name": "Saadi Bouikni",
+    "firstName": "Saadi",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -2006,7 +3006,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_251",
     "name": "Mokhtar Bouikni",
+    "firstName": "Mokhtar",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -2014,7 +3018,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_252",
     "name": "Fils de Saadi Bouikni",
+    "firstName": "Fils de Saadi",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -2022,7 +3030,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_253",
     "name": "Fils de Malika Bouikni",
+    "firstName": "Fils de Malika",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -2030,7 +3042,11 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_254",
     "name": "Rarzki fils de seddik Bouikni",
+    "firstName": "Rarzki fils de seddik",
+    "familyName": "Bouikni",
     "category": "Famille",
+    "branch": "",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
     "comment": ""
@@ -2038,25 +3054,37 @@ export const INITIAL_SPREADSHEET_PEOPLE = [
   {
     "id": "p_255",
     "name": "Zahia Nenni",
+    "firstName": "Zahia",
+    "familyName": "Nenni",
     "category": "Famille",
+    "branch": "Ali",
+    "gender": "F",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Ali"
+    "comment": ""
   },
   {
     "id": "p_256",
     "name": "Ali Nenni",
+    "firstName": "Ali",
+    "familyName": "Nenni",
     "category": "Famille",
+    "branch": "Ali",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Ali"
+    "comment": ""
   },
   {
     "id": "p_257",
     "name": "Rafik Nenni",
+    "firstName": "Rafik",
+    "familyName": "Nenni",
     "category": "Famille",
+    "branch": "Ali",
+    "gender": "H",
     "status": "pending",
     "invitedAt": null,
-    "comment": "Branche: Ali"
+    "comment": ""
   }
 ];

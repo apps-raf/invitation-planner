@@ -1,5 +1,5 @@
 /**
- * InviTrack - Ultra-Light Mobile-First Invitation Tracker (v2.1)
+ * InviTrack - Hierarchical Branch-First Invitation Tracker (v3)
  */
 
 import { store } from './store.js';
@@ -8,8 +8,12 @@ class InvitationApp {
   constructor() {
     this.searchQuery = '';
     this.activeFilter = 'all'; // 'all', 'invited', 'pending', 'declined'
-    this.activeCategory = 'all';
-    this.currentTestedGuests = null;
+    this.activeCategory = 'all'; // 'all', 'Famille', 'Belle Famille', 'Amis', 'Voisins'
+    this.activeBranch = 'all'; // 'all' or specific branch name
+    this.viewMode = store.config.viewMode || 'grouped'; // 'grouped' | 'flat'
+    this.collapsedGroups = new Set();
+    this.allCollapsed = false;
+
     this.init();
   }
 
@@ -47,27 +51,58 @@ class InvitationApp {
       this.renderList();
     });
 
-    // Filter pills
-    document.querySelectorAll('.filter-pill').forEach(btn => {
+    // View Mode Toggle (Grouped vs Flat)
+    document.getElementById('btn-toggle-view-mode')?.addEventListener('click', () => {
+      this.viewMode = this.viewMode === 'grouped' ? 'flat' : 'grouped';
+      store.saveConfig({ viewMode: this.viewMode });
+      this.updateViewModeUI();
+      this.renderList();
+    });
+
+    // Category Tabs (Tous, Famille, Belle Famille, Voisins, Amis)
+    document.querySelectorAll('.cat-pill').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.activeFilter = btn.getAttribute('data-filter');
-        document.querySelectorAll('.filter-pill').forEach(b => {
+        this.activeCategory = btn.getAttribute('data-cat');
+        this.activeBranch = 'all'; // reset sub-branch
+        document.querySelectorAll('.cat-pill').forEach(b => {
           b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
           b.classList.add('bg-slate-800/80', 'text-slate-400');
         });
         btn.classList.remove('bg-slate-800/80', 'text-slate-400');
         btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+
+        this.renderBranchChips();
         this.renderList();
       });
     });
 
-    // Category filter dropdown
-    document.getElementById('category-filter')?.addEventListener('change', (e) => {
-      this.activeCategory = e.target.value;
+    // Status Sub-filter pills (Tous, Invités, À décider, Écartés)
+    document.querySelectorAll('.filter-status-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeFilter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.filter-status-pill').forEach(b => {
+          b.classList.remove('bg-slate-800', 'text-white', 'font-bold');
+          b.classList.add('text-slate-400');
+        });
+        btn.classList.add('bg-slate-800', 'text-white', 'font-bold');
+        btn.classList.remove('text-slate-400');
+        this.renderList();
+      });
+    });
+
+    // Toggle Collapse / Expand all groups
+    document.getElementById('btn-collapse-all')?.addEventListener('click', () => {
+      this.allCollapsed = !this.allCollapsed;
+      const groups = this.getGroupKeys();
+      if (this.allCollapsed) {
+        groups.forEach(g => this.collapsedGroups.add(g));
+      } else {
+        this.collapsedGroups.clear();
+      }
       this.renderList();
     });
 
-    // Quick Add Person Modal
+    // Add Person Modal
     const addModal = document.getElementById('add-modal');
     const addForm = document.getElementById('add-form');
     document.getElementById('btn-open-add')?.addEventListener('click', () => {
@@ -83,17 +118,15 @@ class InvitationApp {
     addForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('add-name-input').value;
-      const category = document.getElementById('add-category-input').value || 'Général';
-      const status = document.getElementById('add-status-input').value || 'pending';
+      const category = document.getElementById('add-category-input').value || 'Famille';
+      const branch = document.getElementById('add-branch-input').value || '';
+      const gender = document.getElementById('add-gender-input').value || '';
       const comment = document.getElementById('add-comment-input').value || '';
 
-      store.addPerson(name, category, status, comment);
+      store.addPerson(name, category, branch, gender, comment);
       addModal.classList.add('hidden');
       addForm.reset();
-      this.searchQuery = '';
-      if (searchInput) searchInput.value = '';
-      if (clearSearchBtn) clearSearchBtn.style.display = 'none';
-      this.showToast(`"${name}" ajouté à la liste !`, 'success');
+      this.showToast(`"${name}" ajouté !`, 'success');
     });
 
     // Decline / Comment modal
@@ -116,172 +149,82 @@ class InvitationApp {
       declineForm.reset();
     });
 
-    // Preset quick reason tags in decline modal
+    // Preset reasons
     document.querySelectorAll('.preset-reason').forEach(tag => {
       tag.addEventListener('click', () => {
-        const input = document.getElementById('decline-comment-input');
-        input.value = tag.getAttribute('data-reason');
+        document.getElementById('decline-comment-input').value = tag.getAttribute('data-reason');
       });
     });
 
-    // Google Sheets Modal
+    // Google Sheets Modal & Reset
     const gsheetModal = document.getElementById('gsheet-modal');
-    const diagBox = document.getElementById('gsheet-diag-result');
-    const importOptions = document.getElementById('gsheet-import-options');
-    const urlInput = document.getElementById('gsheet-url-input');
-
     document.getElementById('btn-open-gsheet')?.addEventListener('click', () => {
-      const { config } = store.getSnapshot();
-      urlInput.value = config.rawUrl || config.endpointUrl || config.sheetCsvUrl || '';
-      diagBox.className = 'hidden p-3 rounded-xl text-xs space-y-2 border';
-      importOptions.classList.add('hidden');
       gsheetModal.classList.remove('hidden');
     });
-
     document.getElementById('btn-close-gsheet')?.addEventListener('click', () => {
       gsheetModal.classList.add('hidden');
     });
 
-    // TEST Google Sheet Connection
-    document.getElementById('btn-test-gsheet')?.addEventListener('click', async () => {
-      const url = urlInput.value.trim();
-      if (!url) {
-        this.showToast('Veuillez coller l\'URL de votre Google Spreadsheet', 'warning');
-        return;
-      }
-
-      diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-slate-800/80 border border-slate-700 text-slate-300 animate-fade-in block';
-      diagBox.innerHTML = `
-        <div class="flex items-center gap-2 text-indigo-400 font-semibold">
-          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          Connexion et analyse de votre feuille en cours...
-        </div>
-      `;
-      importOptions.classList.add('hidden');
-
-      const diag = await store.syncService.testConnection(url);
-
-      if (diag.success) {
-        this.currentTestedGuests = diag.rawGuests;
-        diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 animate-fade-in block';
-        diagBox.innerHTML = `
-          <div class="font-bold text-emerald-400 flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-            Connexion réussie ! ${diag.count} personne(s) détectée(s)
-          </div>
-          ${diag.detectedHeaders ? `<div class="text-[11px] text-slate-300">Colonnes reconnues : <span class="text-white">${diag.detectedHeaders.join(', ')}</span></div>` : ''}
-          <div class="pt-1 text-[11px] text-slate-400 border-t border-emerald-900/50">
-            <p class="font-semibold text-slate-300 mb-1">Aperçu :</p>
-            ${diag.preview.map(p => `
-              <div class="truncate">• <strong>${this.escapeHtml(p.name)}</strong> (${this.escapeHtml(p.category)}) : ${p.status === 'invited' ? '🟢 Invité' : p.status === 'declined' ? '🔴 Écarté' : '🟡 À décider'}</div>
-            `).join('')}
-          </div>
-        `;
-        importOptions.classList.remove('hidden');
-      } else {
-        this.currentTestedGuests = null;
-        diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-rose-950/40 border border-rose-500/40 text-rose-200 animate-fade-in block';
-        diagBox.innerHTML = `
-          <div class="font-bold text-rose-400 flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            Impossible de charger le tableau
-          </div>
-          <div class="text-[11px] leading-relaxed text-slate-300">${diag.error}</div>
-        `;
-      }
-    });
-
-    // Confirm Import into App
-    document.getElementById('btn-confirm-import')?.addEventListener('click', async () => {
-      const url = urlInput.value.trim();
-      const mode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
-
-      this.showToast('Importation en cours...', 'info');
-      const res = await store.syncFromGoogleSheet(url, mode);
-
-      if (res.success) {
-        this.showToast(`Importation réussie : ${res.count} personne(s) chargées !`, 'success');
+    document.getElementById('btn-reset-list')?.addEventListener('click', () => {
+      if (confirm('Recharger la liste des 257 personnes du fichier d\'origine ?')) {
+        store.resetToInitialList();
+        this.showToast('Liste des 257 personnes rechargée !', 'success');
         gsheetModal.classList.add('hidden');
-      } else {
-        this.showToast(`Erreur : ${res.message}`, 'error');
       }
     });
 
-    // Direct CSV File Upload
-    const csvPicker = document.getElementById('file-csv-picker');
-    document.getElementById('btn-upload-csv')?.addEventListener('click', () => csvPicker?.click());
-    csvPicker?.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const text = evt.target.result;
-        const parsed = store.syncService.parseSheetCSV(text);
-        if (parsed.guests.length > 0) {
-          const mode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
-          if (mode === 'replace') {
-            store.people = parsed.guests;
-          } else {
-            parsed.guests.forEach(g => {
-              if (!store.people.some(p => p.name.toLowerCase() === g.name.toLowerCase())) {
-                store.people.push(g);
-              }
-            });
-          }
-          store.save();
-          this.showToast(`${parsed.guests.length} personnes importées depuis le CSV !`, 'success');
-          gsheetModal.classList.add('hidden');
+    // Delegated actions (Clicks on list items and headers)
+    document.getElementById('people-list')?.addEventListener('click', (e) => {
+      // Toggle collapse on branch header
+      const headerBtn = e.target.closest('[data-action="toggle-group"]');
+      if (headerBtn) {
+        const groupKey = headerBtn.getAttribute('data-group-key');
+        if (this.collapsedGroups.has(groupKey)) {
+          this.collapsedGroups.delete(groupKey);
         } else {
-          this.showToast('Aucun nom trouvé dans ce fichier CSV', 'error');
+          this.collapsedGroups.add(groupKey);
         }
-      };
-      reader.readAsText(file);
-      csvPicker.value = '';
-    });
-
-    // Manual Quick Sync button in header
-    document.getElementById('btn-manual-sync')?.addEventListener('click', async () => {
-      const { config } = store.getSnapshot();
-      if (!config.rawUrl && !config.endpointUrl && !config.sheetCsvUrl) {
-        document.getElementById('btn-open-gsheet').click();
+        this.renderList();
         return;
       }
-      this.showToast('Synchronisation avec Google Sheets...', 'info');
-      const res = await store.syncFromGoogleSheet(null, config.importMode || 'replace');
-      if (res.success) {
-        this.showToast(`Synchronisé (${res.count} personnes) !`, 'success');
-      } else {
-        this.showToast(`Erreur : ${res.message}`, 'error');
-      }
-    });
 
-    // Copy Apps Script v2 button
-    document.getElementById('btn-copy-script')?.addEventListener('click', async () => {
-      try {
-        const res = await fetch('./google_apps_script.js');
-        const code = await res.text();
-        navigator.clipboard.writeText(code).then(() => {
-          this.showToast('Code Google Apps Script copié dans le presse-papier !', 'success');
-        });
-      } catch (err) {
-        this.showToast('Erreur lors de la copie du script', 'error');
+      // Batch Invite entire branch
+      const batchInviteBtn = e.target.closest('[data-action="batch-invite"]');
+      if (batchInviteBtn) {
+        e.stopPropagation();
+        const idsStr = batchInviteBtn.getAttribute('data-ids');
+        const ids = idsStr ? idsStr.split(',') : [];
+        if (ids.length > 0) {
+          const count = store.markBatchInvited(ids);
+          this.showToast(`🟢 ${count} personnes de la branche marquées comme invitées !`, 'success');
+        }
+        return;
       }
-    });
 
-    // Delegated status action clicks on list items
-    document.getElementById('people-list')?.addEventListener('click', (e) => {
+      // Batch Reset branch
+      const batchResetBtn = e.target.closest('[data-action="batch-pending"]');
+      if (batchResetBtn) {
+        e.stopPropagation();
+        const idsStr = batchResetBtn.getAttribute('data-ids');
+        const ids = idsStr ? idsStr.split(',') : [];
+        if (ids.length > 0) {
+          store.markBatchPending(ids);
+          this.showToast('Branche remise à "À décider"', 'info');
+        }
+        return;
+      }
+
       // 1-Click: Mark Invited
       const btnInvite = e.target.closest('[data-action="mark-invited"]');
       if (btnInvite) {
         const id = btnInvite.getAttribute('data-id');
         store.markInvited(id);
-        if ('vibrate' in navigator) navigator.vibrate(30);
+        if ('vibrate' in navigator) navigator.vibrate(25);
         this.showToast('Coché : Invité !', 'success');
         return;
       }
 
-      // Mark Declined (open decline note modal)
+      // Mark Declined (open modal)
       const btnDecline = e.target.closest('[data-action="open-decline"]');
       if (btnDecline) {
         currentDeclineId = btnDecline.getAttribute('data-id');
@@ -293,7 +236,7 @@ class InvitationApp {
         return;
       }
 
-      // Mark Pending (To decide)
+      // Mark Pending
       const btnPending = e.target.closest('[data-action="mark-pending"]');
       if (btnPending) {
         const id = btnPending.getAttribute('data-id');
@@ -316,6 +259,18 @@ class InvitationApp {
     });
   }
 
+  updateViewModeUI() {
+    const icon = document.getElementById('view-mode-icon');
+    const label = document.getElementById('view-mode-label');
+    if (this.viewMode === 'grouped') {
+      icon.textContent = '📂';
+      label.textContent = 'Vue Branches';
+    } else {
+      icon.textContent = '📜';
+      label.textContent = 'Vue Liste';
+    }
+  }
+
   getFilteredPeople() {
     const { people } = store.getSnapshot();
     const query = this.searchQuery.toLowerCase().trim();
@@ -323,51 +278,99 @@ class InvitationApp {
     return people.filter(p => {
       const matchSearch = !query ||
         p.name.toLowerCase().includes(query) ||
+        (p.branch && p.branch.toLowerCase().includes(query)) ||
         (p.category && p.category.toLowerCase().includes(query)) ||
         (p.comment && p.comment.toLowerCase().includes(query));
 
-      const matchStatus = this.activeFilter === 'all' || p.status === this.activeFilter;
       const matchCategory = this.activeCategory === 'all' || p.category === this.activeCategory;
+      const matchBranch = this.activeBranch === 'all' || p.branch === this.activeBranch;
+      const matchStatus = this.activeFilter === 'all' || p.status === this.activeFilter;
 
-      return matchSearch && matchStatus && matchCategory;
+      return matchSearch && matchCategory && matchBranch && matchStatus;
+    });
+  }
+
+  getGroupKeys() {
+    const filtered = this.getFilteredPeople();
+    const keys = new Set();
+    filtered.forEach(p => {
+      const key = p.category === 'Famille' 
+        ? `Famille - ${p.branch || 'Autres membres'}`
+        : p.category;
+      keys.add(key);
+    });
+    return Array.from(keys);
+  }
+
+  renderBranchChips() {
+    const container = document.getElementById('branch-chips-container');
+    if (!container) return;
+
+    const { branches, people } = store.getSnapshot();
+
+    if (this.activeCategory !== 'Famille' && this.activeCategory !== 'all') {
+      container.classList.add('hidden');
+      return;
+    }
+
+    container.classList.remove('hidden');
+
+    // Get sorted branches by count
+    const branchEntries = Object.entries(branches).sort((a, b) => b[1] - a[1]);
+
+    const chipsHtml = `
+      <span class="text-[11px] font-semibold text-slate-400 shrink-0 self-center mr-1">Branches :</span>
+      <button data-branch="all" class="branch-chip px-2.5 py-1 rounded-lg text-[11px] font-bold transition shrink-0 ${
+        this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+      }">
+        Toutes (${people.filter(p => p.category === 'Famille').length})
+      </button>
+      ${branchEntries.map(([branch, count]) => `
+        <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2.5 py-1 rounded-lg text-[11px] font-medium transition shrink-0 ${
+          this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+        }">
+          ${this.escapeHtml(branch)} (${count})
+        </button>
+      `).join('')}
+    `;
+
+    container.innerHTML = chipsHtml;
+
+    container.querySelectorAll('.branch-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeBranch = btn.getAttribute('data-branch');
+        this.renderBranchChips();
+        this.renderList();
+      });
     });
   }
 
   render() {
-    const { counts, config, isSyncing, people } = store.getSnapshot();
+    const { counts, categories } = store.getSnapshot();
 
-    // Top counts pills
+    // Top counts
     document.getElementById('count-total').textContent = counts.total;
     document.getElementById('count-invited').textContent = counts.invited;
     document.getElementById('count-pending').textContent = counts.pending;
     document.getElementById('count-declined').textContent = counts.declined;
 
-    // Filter pill badges
-    document.getElementById('badge-filter-all').textContent = counts.total;
-    document.getElementById('badge-filter-invited').textContent = counts.invited;
-    document.getElementById('badge-filter-pending').textContent = counts.pending;
-    document.getElementById('badge-filter-declined').textContent = counts.declined;
+    // Secondary statistics
+    document.getElementById('stat-famille').textContent = `Famille: ${categories['Famille'] || 0}`;
+    document.getElementById('stat-belle-famille').textContent = `Belle Famille: ${categories['Belle Famille'] || 0}`;
+    document.getElementById('stat-voisins').textContent = `Voisins: ${categories['Voisins'] || 0}`;
+    document.getElementById('stat-amis').textContent = `Amis: ${categories['Amis'] || 0}`;
+    document.getElementById('stat-femmes').textContent = `👩 ${counts.femmes} F`;
+    document.getElementById('stat-hommes').textContent = `👨 ${counts.hommes} H`;
 
-    // Sync button status
-    const syncStatusDot = document.getElementById('sync-status-dot');
-    const syncLabel = document.getElementById('sync-label');
-    if (config.rawUrl || config.endpointUrl || config.sheetCsvUrl) {
-      syncStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-      syncLabel.textContent = isSyncing ? 'Synchronisation...' : 'Google Sheet Lié';
-    } else {
-      syncStatusDot.className = 'w-2 h-2 rounded-full bg-amber-400';
-      syncLabel.textContent = 'Lier Google Sheet';
-    }
+    // Category pills badges
+    document.getElementById('cat-badge-all').textContent = counts.total;
+    document.getElementById('cat-badge-famille').textContent = categories['Famille'] || 0;
+    document.getElementById('cat-badge-belle').textContent = categories['Belle Famille'] || 0;
+    document.getElementById('cat-badge-voisins').textContent = categories['Voisins'] || 0;
+    document.getElementById('cat-badge-amis').textContent = categories['Amis'] || 0;
 
-    // Populate category dropdown
-    const categories = Array.from(new Set(people.map(p => p.category || 'Général'))).filter(Boolean);
-    const catSelect = document.getElementById('category-filter');
-    if (catSelect) {
-      const currentVal = this.activeCategory;
-      catSelect.innerHTML = `<option value="all">Tous les groupes</option>` +
-        categories.map(c => `<option value="${this.escapeHtml(c)}" ${c === currentVal ? 'selected' : ''}>${this.escapeHtml(c)}</option>`).join('');
-    }
-
+    this.updateViewModeUI();
+    this.renderBranchChips();
     this.renderList();
   }
 
@@ -393,110 +396,211 @@ class InvitationApp {
       } else {
         container.innerHTML = `
           <div class="p-12 text-center text-slate-500">
-            <p class="text-sm font-medium text-slate-400">Aucune personne dans cette catégorie</p>
-            <p class="text-xs text-slate-600 mt-1">Utilisez la recherche ci-dessus pour trouver ou ajouter quelqu'un.</p>
+            <p class="text-sm font-medium text-slate-400">Aucun invité trouvé avec ces filtres</p>
           </div>
         `;
       }
       return;
     }
 
-    container.innerHTML = filtered.map(person => {
-      const isInvited = person.status === 'invited';
-      const isDeclined = person.status === 'declined';
-      const isPending = !isInvited && !isDeclined;
+    // 1. Grouped / Hierarchical View
+    if (this.viewMode === 'grouped') {
+      const groupsMap = new Map();
 
-      const dateStr = person.invitedAt ? new Date(person.invitedAt).toLocaleDateString('fr-FR', {
-        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-      }) : null;
+      filtered.forEach(p => {
+        let groupTitle = '';
+        let groupType = 'cat';
 
-      return `
-        <div class="glass-card rounded-2xl p-4 border transition ${
-          isInvited ? 'border-emerald-500/30 bg-emerald-950/10' :
-          isDeclined ? 'border-rose-500/20 bg-rose-950/10 opacity-75' :
-          'border-slate-800 bg-slate-900/60'
-        } flex flex-col gap-3">
+        if (p.category === 'Famille') {
+          groupTitle = p.branch ? `Branche ${p.branch}` : 'Famille Ourahmoune (Autres membres)';
+          groupType = 'branch';
+        } else if (p.category === 'Belle Famille') {
+          groupTitle = 'Belle Famille (Izri)';
+        } else if (p.category === 'Voisins') {
+          groupTitle = 'Voisins';
+        } else if (p.category === 'Amis') {
+          groupTitle = 'Amis';
+        } else {
+          groupTitle = p.category;
+        }
 
-          <!-- Top Row: Name, Category, & Status Info -->
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="font-bold text-white text-base truncate">${this.escapeHtml(person.name)}</h3>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                  ${this.escapeHtml(person.category || 'Général')}
-                </span>
+        if (!groupsMap.has(groupTitle)) {
+          groupsMap.set(groupTitle, []);
+        }
+        groupsMap.get(groupTitle).push(p);
+      });
+
+      container.innerHTML = Array.from(groupsMap.entries()).map(([title, members]) => {
+        const isCollapsed = this.collapsedGroups.has(title) && !query;
+        const invitedCount = members.filter(m => m.status === 'invited').length;
+        const pendingCount = members.filter(m => m.status === 'pending').length;
+        const declinedCount = members.filter(m => m.status === 'declined').length;
+        const memberIds = members.map(m => m.id).join(',');
+
+        return `
+          <div class="glass-panel rounded-2xl border border-slate-800/80 overflow-hidden shadow-lg transition">
+            <!-- Group Header -->
+            <div data-action="toggle-group" data-group-key="${this.escapeAttr(title)}" class="p-3.5 bg-slate-900/90 hover:bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 cursor-pointer select-none">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-base">${isCollapsed ? '▶' : '▼'}</span>
+                <div>
+                  <h3 class="font-bold text-white text-sm truncate flex items-center gap-2">
+                    <span>${this.escapeHtml(title)}</span>
+                    <span class="text-xs font-normal text-slate-400">(${members.length} pers.)</span>
+                  </h3>
+                  <!-- Sub-counts -->
+                  <div class="flex items-center gap-2 text-[11px] mt-0.5">
+                    ${invitedCount > 0 ? `<span class="text-emerald-400 font-semibold">🟢 ${invitedCount} invité(s)</span>` : ''}
+                    ${pendingCount > 0 ? `<span class="text-amber-400">🟡 ${pendingCount} à décider</span>` : ''}
+                    ${declinedCount > 0 ? `<span class="text-rose-400">🔴 ${declinedCount} écarté(s)</span>` : ''}
+                  </div>
+                </div>
               </div>
 
-              <!-- Timestamp & Comment badge -->
-              <div class="mt-1 text-xs flex flex-wrap items-center gap-x-3 gap-y-1">
-                ${isInvited && dateStr ? `
-                  <span class="text-emerald-400 font-medium flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Invité le ${dateStr}
+              <!-- Quick Bulk Action Button -->
+              <div class="flex items-center gap-1.5 shrink-0">
+                ${pendingCount > 0 ? `
+                  <button data-action="batch-invite" data-ids="${memberIds}" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1" title="Inviter toute la branche">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>Tout inviter</span>
+                  </button>
+                ` : `
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Complété ✓
                   </span>
-                ` : ''}
-
-                ${isDeclined ? `
-                  <span class="text-rose-400 font-medium">❌ Non invité</span>
-                ` : ''}
-
-                ${isPending ? `
-                  <span class="text-amber-400 font-medium">⏳ À décider</span>
-                ` : ''}
-
-                ${person.comment ? `
-                  <span class="text-slate-400 italic text-[11px] bg-slate-800/80 px-2 py-0.5 rounded">
-                    💬 ${this.escapeHtml(person.comment)}
-                  </span>
-                ` : ''}
+                `}
               </div>
             </div>
 
-            <!-- Delete action icon -->
-            <button data-action="delete" data-id="${person.id}" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition" title="Supprimer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
+            <!-- Group Cards -->
+            ${!isCollapsed ? `
+              <div class="p-2.5 space-y-2.5 bg-slate-950/40">
+                ${members.map(person => this.renderPersonCard(person)).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+    } else {
+      // 2. Flat Continuous View
+      container.innerHTML = filtered.map(person => this.renderPersonCard(person)).join('');
+    }
+  }
+
+  renderPersonCard(person) {
+    const isInvited = person.status === 'invited';
+    const isDeclined = person.status === 'declined';
+    const isPending = !isInvited && !isDeclined;
+
+    const dateStr = person.invitedAt ? new Date(person.invitedAt).toLocaleDateString('fr-FR', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+    }) : null;
+
+    return `
+      <div class="glass-card rounded-2xl p-3.5 border transition ${
+        isInvited ? 'border-emerald-500/40 bg-emerald-950/20' :
+        isDeclined ? 'border-rose-500/20 bg-rose-950/15 opacity-75' :
+        'border-slate-800/80 bg-slate-900/60'
+      } flex flex-col gap-2.5">
+
+        <!-- Top Row: Name, Gender & Branch -->
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h4 class="font-bold text-white text-base truncate">${this.escapeHtml(person.name)}</h4>
+              
+              <!-- Gender Badge -->
+              ${person.gender ? `
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                  person.gender === 'F' ? 'bg-pink-500/20 text-pink-300 border border-pink-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                }">
+                  ${person.gender === 'F' ? '👩 Femme' : '👨 Homme'}
+                </span>
+              ` : ''}
+
+              <!-- Branch Badge (if in flat view or different category) -->
+              ${person.branch ? `
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                  🏷️ ${this.escapeHtml(person.branch)}
+                </span>
+              ` : ''}
+            </div>
+
+            <!-- Status & Comment details -->
+            <div class="mt-1 text-xs flex flex-wrap items-center gap-x-2 gap-y-1">
+              ${isInvited && dateStr ? `
+                <span class="text-emerald-400 font-semibold flex items-center gap-1 text-[11px]">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Invité le ${dateStr}
+                </span>
+              ` : ''}
+
+              ${isDeclined ? `
+                <span class="text-rose-400 font-medium text-[11px]">❌ Non invité</span>
+              ` : ''}
+
+              ${isPending ? `
+                <span class="text-amber-400/90 text-[11px]">⏳ À décider</span>
+              ` : ''}
+
+              ${person.comment ? `
+                <span class="text-slate-400 italic text-[11px] bg-slate-800/80 px-2 py-0.5 rounded">
+                  💬 ${this.escapeHtml(person.comment)}
+                </span>
+              ` : ''}
+            </div>
           </div>
 
-          <!-- Bottom Action Buttons: Fast 3-Pill Toggle -->
-          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80">
-            <!-- 1. INVITÉ -->
-            <button data-action="mark-invited" data-id="${person.id}" class="py-2 px-1 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 ${
-              isInvited
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
-            }">
-              <svg class="w-4 h-4 ${isInvited ? 'text-white' : 'text-emerald-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-              <span>Invité</span>
-            </button>
-
-            <!-- 2. À DÉCIDER -->
-            <button data-action="mark-pending" data-id="${person.id}" class="py-2 px-1 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1 ${
-              isPending
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30 font-bold'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
-            }">
-              <span>À décider</span>
-            </button>
-
-            <!-- 3. NE PAS INVITER -->
-            <button data-action="open-decline" data-id="${person.id}" class="py-2 px-1 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1.5 ${
-              isDeclined
-                ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30 font-bold'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
-            }">
-              <svg class="w-3.5 h-3.5 ${isDeclined ? 'text-white' : 'text-rose-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              <span>Écarter</span>
-            </button>
-          </div>
+          <!-- Quick Delete -->
+          <button data-action="delete" data-id="${person.id}" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition" title="Supprimer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
         </div>
-      `;
-    }).join('');
+
+        <!-- 3-Pill Toggle -->
+        <div class="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-slate-800/80">
+          <!-- 1. INVITÉ -->
+          <button data-action="mark-invited" data-id="${person.id}" class="py-1.5 px-1 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1 ${
+            isInvited
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+              : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
+          }">
+            <svg class="w-3.5 h-3.5 ${isInvited ? 'text-white' : 'text-emerald-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <span>Invité</span>
+          </button>
+
+          <!-- 2. À DÉCIDER -->
+          <button data-action="mark-pending" data-id="${person.id}" class="py-1.5 px-1 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1 ${
+            isPending
+              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30 font-bold'
+              : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
+          }">
+            <span>À décider</span>
+          </button>
+
+          <!-- 3. ÉCARTER -->
+          <button data-action="open-decline" data-id="${person.id}" class="py-1.5 px-1 text-xs font-medium rounded-xl transition flex items-center justify-center gap-1 ${
+            isDeclined
+              ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 font-bold'
+              : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border border-slate-700/60'
+          }">
+            <svg class="w-3.5 h-3.5 ${isDeclined ? 'text-white' : 'text-rose-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <span>Écarter</span>
+          </button>
+        </div>
+      </div>
+    `;
   }
 
   escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  escapeAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   showToast(message, type = 'info') {

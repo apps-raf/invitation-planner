@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>InviTrack - Suivi d'Invitations</title>
-  <meta name="description" content="Application légère pour suivre qui est invité, à décider ou écarté, synchronisée avec Google Sheets">
+  <title>InviTrack - Gestionnaire & Suivi d'Invitations</title>
+  <meta name="description" content="Gestion et suivi précis des invitations par branches familiales et groupes">
 
   <!-- PWA Meta -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -35,101 +35,134 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col items-center">
 
-  <div class="w-full max-w-xl min-h-screen flex flex-col pb-28 px-4 sm:px-6">
+  <div class="w-full max-w-2xl min-h-screen flex flex-col pb-28 px-3.5 sm:px-6">
 
-    <!-- Top Sticky Bar: Metrics & Google Sheets Sync -->
-    <header class="sticky top-0 z-30 pt-3 pb-2 bg-slate-950/95 backdrop-blur-xl border-b border-slate-900 flex flex-col gap-2">
-      <!-- Title & Sync Button -->
+    <!-- Top Sticky Bar: Metrics & Actions -->
+    <header class="sticky top-0 z-30 pt-3 pb-2 bg-slate-950/95 backdrop-blur-xl border-b border-slate-900 flex flex-col gap-2.5">
+      <!-- Title & Controls -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-600 to-pink-500 p-1 shadow">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-pink-500 p-1.5 shadow-md shadow-indigo-500/20">
             <img src="icons/icon.svg" alt="InviTrack" class="w-full h-full object-contain">
           </div>
-          <span class="font-extrabold text-white text-base tracking-tight">InviTrack</span>
+          <div>
+            <h1 class="font-extrabold text-white text-base tracking-tight leading-none">InviTrack</h1>
+            <p class="text-[10px] text-slate-400 font-medium">Suivi & Organisation par Branches</p>
+          </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Manual sync trigger -->
-          <button id="btn-manual-sync" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" title="Synchroniser">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <!-- View Mode Switcher: Grouped vs Flat -->
+          <button id="btn-toggle-view-mode" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition">
+            <span id="view-mode-icon">📂</span>
+            <span id="view-mode-label">Vue Branches</span>
           </button>
 
           <!-- Google Sheet Config Button -->
-          <button id="btn-open-gsheet" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition">
-            <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span id="sync-label">Lier Google Sheet</span>
+          <button id="btn-open-gsheet" class="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition" title="Liaison Google Sheet">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- Live Counters Bar -->
+      <!-- Live Counters Grid -->
       <div class="grid grid-cols-4 gap-1.5 text-center text-xs">
         <div class="bg-slate-900/80 border border-slate-800/80 rounded-xl py-1.5 px-1">
-          <p id="count-total" class="font-extrabold text-white text-sm">0</p>
+          <p id="count-total" class="font-black text-white text-sm">0</p>
           <p class="text-[10px] text-slate-400">Total</p>
         </div>
         <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-xl py-1.5 px-1">
-          <p id="count-invited" class="font-extrabold text-emerald-400 text-sm">0</p>
+          <p id="count-invited" class="font-black text-emerald-400 text-sm">0</p>
           <p class="text-[10px] text-emerald-300/80">Invités</p>
         </div>
         <div class="bg-amber-950/20 border border-amber-500/20 rounded-xl py-1.5 px-1">
-          <p id="count-pending" class="font-extrabold text-amber-400 text-sm">0</p>
+          <p id="count-pending" class="font-black text-amber-400 text-sm">0</p>
           <p class="text-[10px] text-amber-300/80">À décider</p>
         </div>
         <div class="bg-rose-950/20 border border-rose-500/20 rounded-xl py-1.5 px-1">
-          <p id="count-declined" class="font-extrabold text-rose-400 text-sm">0</p>
+          <p id="count-declined" class="font-black text-rose-400 text-sm">0</p>
           <p class="text-[10px] text-rose-300/80">Écartés</p>
+        </div>
+      </div>
+
+      <!-- Secondary Sub-Statistics (Groups & Genders) -->
+      <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 overflow-x-auto scrollbar-none gap-2">
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="stat-famille" class="hover:text-white cursor-pointer transition">Famille: 0</span>
+          <span>•</span>
+          <span id="stat-belle-famille" class="hover:text-white cursor-pointer transition">Belle Famille: 0</span>
+          <span>•</span>
+          <span id="stat-voisins" class="hover:text-white cursor-pointer transition">Voisins: 0</span>
+          <span>•</span>
+          <span id="stat-amis" class="hover:text-white cursor-pointer transition">Amis: 0</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 text-slate-400 border-l border-slate-800 pl-2">
+          <span id="stat-femmes">👩 0</span>
+          <span id="stat-hommes">👨 0</span>
         </div>
       </div>
     </header>
 
-    <!-- Main Search Bar (Hero Input) -->
-    <div class="pt-4 pb-2 space-y-3">
+    <!-- Search Hero Bar -->
+    <div class="pt-3 pb-2 space-y-2.5">
       <div class="relative">
         <svg class="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <input 
           type="text" 
           id="search-input" 
-          placeholder="Taper un nom pour chercher ou inviter..." 
+          placeholder="Rechercher un prénom, famille ou branche..." 
           autocomplete="off" 
           class="w-full bg-slate-900 border-2 border-slate-800 focus:border-indigo-500 rounded-2xl pl-11 pr-10 py-3 text-base text-white placeholder-slate-500 focus:outline-none transition shadow-lg shadow-black/40"
         />
         <button id="btn-clear-search" class="absolute right-3.5 top-3.5 text-slate-500 hover:text-white hidden font-bold text-sm">✕</button>
       </div>
 
-      <!-- Filters & Categories Row -->
-      <div class="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-1">
-        <!-- Status Filter Pills -->
-        <div class="flex items-center gap-1.5">
-          <button data-filter="all" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md transition flex items-center gap-1">
-            <span>Tous</span>
-            <span id="badge-filter-all" class="text-[10px] opacity-75">0</span>
-          </button>
-          <button data-filter="invited" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition flex items-center gap-1">
-            <span>🟢 Invités</span>
-            <span id="badge-filter-invited" class="text-[10px] opacity-75">0</span>
-          </button>
-          <button data-filter="pending" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition flex items-center gap-1">
-            <span>🟡 À décider</span>
-            <span id="badge-filter-pending" class="text-[10px] opacity-75">0</span>
-          </button>
-          <button data-filter="declined" class="filter-pill px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition flex items-center gap-1">
-            <span>🔴 Écartés</span>
-            <span id="badge-filter-declined" class="text-[10px] opacity-75">0</span>
-          </button>
+      <!-- Main Category Filter Tabs -->
+      <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+        <button data-cat="all" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md transition shrink-0 flex items-center gap-1.5">
+          <span>Tous</span>
+          <span id="cat-badge-all" class="text-[10px] opacity-80">257</span>
+        </button>
+        <button data-cat="Famille" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
+          <span>👨‍👩‍👧‍👦 Famille</span>
+          <span id="cat-badge-famille" class="text-[10px] opacity-80">192</span>
+        </button>
+        <button data-cat="Belle Famille" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
+          <span>💍 Belle Famille</span>
+          <span id="cat-badge-belle" class="text-[10px] opacity-80">25</span>
+        </button>
+        <button data-cat="Voisins" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
+          <span>🏡 Voisins</span>
+          <span id="cat-badge-voisins" class="text-[10px] opacity-80">24</span>
+        </button>
+        <button data-cat="Amis" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
+          <span>🎉 Amis</span>
+          <span id="cat-badge-amis" class="text-[10px] opacity-80">16</span>
+        </button>
+      </div>
+
+      <!-- Sub-Branch Filter Row (Dynamic when Famille is active or all) -->
+      <div id="branch-chips-container" class="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Status Sub-filter pills (Tous, Invités, À décider, Écartés) -->
+      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-900 text-xs">
+        <div class="flex items-center gap-1">
+          <button data-filter="all" class="filter-status-pill px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white transition">Tous</button>
+          <button data-filter="invited" class="filter-status-pill px-2.5 py-1 rounded-lg text-xs font-medium text-emerald-400 hover:bg-slate-800 transition">🟢 Invités</button>
+          <button data-filter="pending" class="filter-status-pill px-2.5 py-1 rounded-lg text-xs font-medium text-amber-400 hover:bg-slate-800 transition">🟡 À décider</button>
+          <button data-filter="declined" class="filter-status-pill px-2.5 py-1 rounded-lg text-xs font-medium text-rose-400 hover:bg-slate-800 transition">🔴 Écartés</button>
         </div>
 
-        <!-- Category Dropdown -->
-        <div class="shrink-0">
-          <select id="category-filter" class="bg-slate-900 border border-slate-800 text-slate-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none">
-            <option value="all">Tous groupes</option>
-          </select>
-        </div>
+        <button id="btn-collapse-all" class="text-[11px] text-slate-400 hover:text-white underline">
+          Tout replier / déplier
+        </button>
       </div>
     </div>
 
-    <!-- People List -->
-    <main id="people-list" class="space-y-3 pt-2 flex-1"></main>
+    <!-- Main Content List (Rendered dynamically) -->
+    <main id="people-list" class="space-y-4 pt-2 flex-1"></main>
 
     <!-- Floating Action Button: Add Person -->
     <div class="fixed bottom-6 right-6 z-30">
@@ -151,34 +184,38 @@
       <form id="add-form" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Nom complet *</label>
-          <input type="text" id="add-name-input" required placeholder="ex: Julien & Marie" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" />
+          <input type="text" id="add-name-input" required placeholder="ex: Karim Ourahmoune" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" />
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Groupe / Cercle</label>
-            <input type="text" id="add-category-input" list="preset-categories" placeholder="Amis, Famille..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
-            <datalist id="preset-categories">
-              <option value="Famille"></option>
-              <option value="Amis"></option>
-              <option value="Témoins"></option>
-              <option value="Collègues"></option>
-              <option value="Voisins"></option>
-            </datalist>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Catégorie</label>
+            <select id="add-category-input" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="Famille">Famille</option>
+              <option value="Belle Famille">Belle Famille</option>
+              <option value="Amis">Amis</option>
+              <option value="Voisins">Voisins</option>
+            </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Statut initial</label>
-            <select id="add-status-input" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-              <option value="pending">🟡 À décider</option>
-              <option value="invited">🟢 Invité</option>
-              <option value="declined">🔴 Écarté</option>
-            </select>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Branche familiale</label>
+            <input type="text" id="add-branch-input" placeholder="ex: Bouzid, Daoud..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Commentaire / Remarque (optionnel)</label>
-          <input type="text" id="add-comment-input" placeholder="ex: Inviter avec les enfants" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Sexe</label>
+            <select id="add-gender-input" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="">Non spécifié</option>
+              <option value="F">Femme (F)</option>
+              <option value="H">Homme (H)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Commentaire</label>
+            <input type="text" id="add-comment-input" placeholder="Notes optionnelles" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+          </div>
         </div>
 
         <div class="pt-2 flex justify-end gap-2">
@@ -226,7 +263,7 @@
     </div>
   </div>
 
-  <!-- Modal: Google Sheets Connection & Live Diagnostic -->
+  <!-- Modal: Google Sheets Connection -->
   <div id="gsheet-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between">
@@ -236,7 +273,6 @@
         <button id="btn-close-gsheet" class="text-slate-400 hover:text-white font-bold p-1">✕</button>
       </div>
 
-      <!-- URL Input -->
       <div>
         <label class="block text-xs font-semibold text-slate-300 mb-1">URL de votre Google Spreadsheet</label>
         <div class="flex gap-2">
@@ -250,62 +286,21 @@
             Tester
           </button>
         </div>
-        <p class="text-[11px] text-slate-400 mt-1">Accepte directement votre lien de tableau <span class="text-slate-300">docs.google.com/spreadsheets/...</span> ou l'URL de votre Web App Apps Script.</p>
       </div>
 
-      <!-- Diagnostic / Test Result Container -->
       <div id="gsheet-diag-result" class="hidden p-3 rounded-xl text-xs space-y-2 border"></div>
 
-      <!-- Import Options (Shown when test succeeds) -->
       <div id="gsheet-import-options" class="hidden space-y-3 pt-2 border-t border-slate-800">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Mode d'importation :</label>
-          <div class="space-y-1.5">
-            <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-              <input type="radio" name="import-mode" value="replace" checked class="text-indigo-600 bg-slate-800 border-slate-700" />
-              <span><strong>Remplacer ma liste</strong> (efface les exemples démo, garde uniquement la feuille)</span>
-            </label>
-            <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-              <input type="radio" name="import-mode" value="merge" class="text-indigo-600 bg-slate-800 border-slate-700" />
-              <span><strong>Fusionner</strong> (conserve les personnes déjà ajoutées)</span>
-            </label>
-          </div>
-        </div>
-
         <button id="btn-confirm-import" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition">
           Valider et Importer dans l'App
         </button>
       </div>
 
-      <!-- Advanced Two-way Apps Script Accordion -->
-      <div class="pt-2 border-t border-slate-800">
-        <details class="text-xs text-slate-400 group">
-          <summary class="cursor-pointer font-semibold text-indigo-400 hover:text-indigo-300 py-1">
-            ⚙️ Vous voulez la mise à jour 2-sens en direct ? (Google Apps Script)
-          </summary>
-          <div class="mt-2 p-3 bg-slate-800/80 rounded-xl space-y-2 text-[11px] leading-relaxed">
-            <p>Le lien direct Google Sheet permet d'importer et de rafraîchir la liste à tout moment. Si vous voulez qu'une coche sur votre téléphone écrive en direct dans votre Google Sheet :</p>
-            <ol class="list-decimal pl-4 space-y-1 text-slate-300">
-              <li>Dans votre Google Sheet : <strong>Extensions > Apps Script</strong>.</li>
-              <li>Collez le code ci-dessous et cliquez sur <strong>Déployer > Nouveau déploiement</strong> (Application Web, Accès : Tout le monde).</li>
-              <li>Collez l'URL obtenue dans le champ ci-dessus !</li>
-            </ol>
-            <button id="btn-copy-script" class="mt-1 w-full py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg font-semibold transition">
-              📋 Copier le code Apps Script v2
-            </button>
-          </div>
-        </details>
-      </div>
-
-      <!-- Direct CSV Upload as fallback -->
       <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span>Ou fichier direct :</span>
-        <button id="btn-upload-csv" class="text-indigo-400 hover:text-indigo-300 underline font-semibold">
-          Importer un fichier .CSV
+        <button id="btn-reset-list" class="text-amber-400 hover:text-amber-300 underline font-semibold">
+          Recharger les 257 personnes du fichier d'origine
         </button>
-        <input type="file" id="file-csv-picker" accept=".csv" class="hidden" />
       </div>
-
     </div>
   </div>
 
