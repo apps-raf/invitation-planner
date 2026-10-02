@@ -7,7 +7,7 @@ import { store } from './store.js';
 import {
   getCurrentManager,
   setCurrentManager,
-  loginWithPin,
+  verifyAndLogin,
   updateManagerPin,
   fetchAuditLogs,
   fetchManagers
@@ -86,17 +86,22 @@ class InvitationApp {
     const authModal = document.getElementById('auth-modal');
     const stepLogin = document.getElementById('auth-step-login');
     const stepChange = document.getElementById('auth-step-changepin');
+    const nameInput = document.getElementById('auth-name-input');
     const pinInput = document.getElementById('auth-pin-input');
     const errorEl = document.getElementById('auth-error-msg');
 
     if (errorEl) errorEl.classList.add('hidden');
+    if (nameInput) nameInput.value = '';
     if (pinInput) pinInput.value = '';
 
     stepLogin?.classList.remove('hidden');
     stepChange?.classList.add('hidden');
     authModal?.classList.remove('hidden');
 
-    setTimeout(() => pinInput?.focus(), 150);
+    setTimeout(() => {
+      if (nameInput) nameInput.focus();
+      else if (pinInput) pinInput.focus();
+    }, 150);
   }
 
   showChangePinModal(isMandatory = false) {
@@ -127,52 +132,67 @@ class InvitationApp {
 
   bindAuthEvents() {
     const authModal = document.getElementById('auth-modal');
+    const nameInput = document.getElementById('auth-name-input');
     const pinInput = document.getElementById('auth-pin-input');
     const btnSubmitLogin = document.getElementById('btn-submit-login');
     const errorEl = document.getElementById('auth-error-msg');
 
-    // Enter key submits PIN
+    nameInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        pinInput?.focus();
+      }
+    });
+
     pinInput?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         btnSubmitLogin?.click();
       }
     });
 
-    // Auto-submit when 4 digits entered
-    pinInput?.addEventListener('input', () => {
+    nameInput?.addEventListener('input', () => {
       if (errorEl) errorEl.classList.add('hidden');
-      if (pinInput.value.length === 4) {
-        btnSubmitLogin?.click();
-      }
     });
 
-    // Submit PIN Login (Direct PIN authentication, no username required)
+    pinInput?.addEventListener('input', () => {
+      if (errorEl) errorEl.classList.add('hidden');
+    });
+
+    // Submit Name + PIN Login
     btnSubmitLogin?.addEventListener('click', async () => {
+      const name = nameInput ? nameInput.value.trim() : '';
       const pin = pinInput ? pinInput.value.trim() : '';
-      if (!pin || pin.length !== 4) {
+
+      if (!name) {
         if (errorEl) {
-          errorEl.textContent = 'Veuillez saisir votre code à 4 chiffres';
+          errorEl.textContent = 'Veuillez saisir votre prénom';
           errorEl.classList.remove('hidden');
         }
+        nameInput?.focus();
+        return;
+      }
+
+      if (!pin || pin.length !== 4) {
+        if (errorEl) {
+          errorEl.textContent = 'Veuillez saisir votre code PIN à 4 chiffres';
+          errorEl.classList.remove('hidden');
+        }
+        pinInput?.focus();
         return;
       }
 
       btnSubmitLogin.disabled = true;
       btnSubmitLogin.innerHTML = '<span>Vérification...</span>';
 
-      const res = await loginWithPin(pin);
+      const res = await verifyAndLogin(name, pin);
       btnSubmitLogin.disabled = false;
-      btnSubmitLogin.innerHTML = '<span>Déverrouiller</span><span>➜</span>';
+      btnSubmitLogin.innerHTML = '<span>Se connecter</span><span>➜</span>';
 
       if (!res.success) {
         if (errorEl) {
-          errorEl.textContent = res.message || 'Code PIN incorrect';
+          errorEl.textContent = res.message || 'Identifiant ou code PIN incorrect';
           errorEl.classList.remove('hidden');
         }
-        if (pinInput) {
-          pinInput.value = '';
-          pinInput.focus();
-        }
+        if (pinInput) pinInput.value = '';
         return;
       }
 

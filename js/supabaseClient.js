@@ -55,52 +55,33 @@ export async function fetchManagers() {
   return data || [];
 }
 
-export async function loginWithPin(pin) {
+export async function verifyAndLogin(inputName, pin) {
   const sb = getSupabase();
   if (!sb) return { success: false, message: 'Supabase non initialisé' };
+
+  const cleanName = (inputName || '').trim().toLowerCase();
+  if (!cleanName) {
+    return { success: false, message: 'Veuillez saisir votre prénom' };
+  }
+
+  // Allowed managers check: rafik, meriem, celina
+  const allowed = ['rafik', 'meriem', 'celina'];
+  if (!allowed.includes(cleanName)) {
+    return { success: false, message: 'Identifiant non reconnu' };
+  }
 
   if (!pin || pin.length !== 4) {
-    return { success: false, message: 'Veuillez saisir un code à 4 chiffres' };
+    return { success: false, message: 'Veuillez saisir un code PIN à 4 chiffres' };
   }
 
   const { data, error } = await sb
     .from('managers')
     .select('id, name, pin, role')
-    .eq('pin', pin);
-
-  if (error || !data || data.length === 0) {
-    return { success: false, message: 'Code PIN incorrect' };
-  }
-
-  const manager = data[0];
-  const mustChangePin = (pin === '0000');
-  const sessionData = {
-    id: manager.id,
-    name: manager.name,
-    role: manager.role,
-    mustChangePin
-  };
-
-  setCurrentManager(sessionData);
-  return { success: true, manager: sessionData, mustChangePin };
-}
-
-export async function verifyAndLogin(managerNameOrPin, pin) {
-  if (pin === undefined) {
-    return loginWithPin(managerNameOrPin);
-  }
-
-  const sb = getSupabase();
-  if (!sb) return { success: false, message: 'Supabase non initialisé' };
-
-  const { data, error } = await sb
-    .from('managers')
-    .select('id, name, pin, role')
-    .eq('name', managerNameOrPin)
+    .eq('name', cleanName)
     .single();
 
   if (error || !data) {
-    return { success: false, message: 'Utilisateur introuvable' };
+    return { success: false, message: 'Identifiant non reconnu' };
   }
 
   if (data.pin !== pin) {
