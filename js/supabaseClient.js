@@ -60,18 +60,20 @@ export async function verifyAndLogin(inputName, pin) {
   if (!sb) return { success: false, message: 'Supabase non initialisé' };
 
   const cleanName = (inputName || '').trim().toLowerCase();
+  const cleanPin = (pin || '').trim();
+
   if (!cleanName) {
     return { success: false, message: 'Veuillez saisir votre prénom' };
   }
 
-  // Allowed managers check: rafik, meriem, celina
-  const allowed = ['rafik', 'meriem', 'celina'];
+  // Allowed managers check: admin, rafik, meriem, celina
+  const allowed = ['admin', 'rafik', 'meriem', 'celina'];
   if (!allowed.includes(cleanName)) {
     return { success: false, message: 'Identifiant non reconnu' };
   }
 
-  if (!pin || pin.length !== 4) {
-    return { success: false, message: 'Veuillez saisir un code PIN à 4 chiffres' };
+  if (!cleanPin) {
+    return { success: false, message: 'Veuillez saisir votre code PIN' };
   }
 
   const { data, error } = await sb
@@ -84,15 +86,16 @@ export async function verifyAndLogin(inputName, pin) {
     return { success: false, message: 'Identifiant non reconnu' };
   }
 
-  if (data.pin !== pin) {
+  if (data.pin !== cleanPin) {
     return { success: false, message: 'Code PIN incorrect' };
   }
 
-  const mustChangePin = (pin === '0000');
+  // Admin does not need to change PIN
+  const mustChangePin = (cleanName !== 'admin' && cleanPin === '0000');
   const sessionData = {
     id: data.id,
     name: data.name,
-    role: data.role,
+    role: data.role || (cleanName === 'admin' ? 'superadmin' : 'manager'),
     mustChangePin
   };
 

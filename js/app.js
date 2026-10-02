@@ -37,8 +37,9 @@ class InvitationApp {
 
     store.subscribe(() => this.render());
     store.onAuditUpdate(() => {
+      const isAdmin = this.currentManager && (this.currentManager.name === 'admin' || this.currentManager.role === 'superadmin');
       const historyModal = document.getElementById('history-modal');
-      if (historyModal && !historyModal.classList.contains('hidden')) {
+      if (isAdmin && historyModal && !historyModal.classList.contains('hidden')) {
         this.renderHistoryList();
       }
     });
@@ -68,10 +69,23 @@ class InvitationApp {
   updateUserHeaderUI() {
     const nameEl = document.getElementById('header-user-name');
     const dotEl = document.getElementById('cloud-status-dot');
+    const btnHistory = document.getElementById('btn-open-history');
 
     if (nameEl) {
       nameEl.textContent = '';
       nameEl.classList.add('hidden');
+    }
+
+    // Only admin can see and access the Journal
+    const isAdmin = this.currentManager && (this.currentManager.name === 'admin' || this.currentManager.role === 'superadmin');
+    if (btnHistory) {
+      if (isAdmin) {
+        btnHistory.classList.remove('hidden');
+        btnHistory.classList.add('flex');
+      } else {
+        btnHistory.classList.add('hidden');
+        btnHistory.classList.remove('flex');
+      }
     }
 
     if (dotEl) {
@@ -171,9 +185,9 @@ class InvitationApp {
         return;
       }
 
-      if (!pin || pin.length !== 4) {
+      if (!pin) {
         if (errorEl) {
-          errorEl.textContent = 'Veuillez saisir votre code PIN à 4 chiffres';
+          errorEl.textContent = 'Veuillez saisir votre code PIN';
           errorEl.classList.remove('hidden');
         }
         pinInput?.focus();
@@ -300,6 +314,11 @@ class InvitationApp {
     const btnCloseHistory = document.getElementById('btn-close-history');
 
     btnOpenHistory?.addEventListener('click', () => {
+      const isAdmin = this.currentManager && (this.currentManager.name === 'admin' || this.currentManager.role === 'superadmin');
+      if (!isAdmin) {
+        this.showToast('Accès réservé à l\'administrateur', 'warning');
+        return;
+      }
       historyModal.classList.remove('hidden');
       this.renderHistoryList();
     });
