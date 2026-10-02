@@ -1,0 +1,18 @@
+{
+  "name": "Invitation Planner & Tracker",
+  "short_name": "InviTrack",
+  "description": "Smart invitation management and tracking app for events and weddings",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
