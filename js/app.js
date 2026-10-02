@@ -220,6 +220,7 @@ class InvitationApp {
       } else {
         authModal.classList.add('hidden');
         this.showToast('Connexion réussie !', 'success');
+        this.render();
       }
     });
 
@@ -277,6 +278,7 @@ class InvitationApp {
       this.currentManager.mustChangePin = false;
       authModal.classList.add('hidden');
       this.showToast('Nouveau code PIN enregistré !', 'success');
+      this.render();
     });
 
     // User Profile Menu Modal
@@ -304,6 +306,7 @@ class InvitationApp {
       setCurrentManager(null);
       this.currentManager = null;
       this.updateUserHeaderUI();
+      this.render();
       this.showLoginModal();
     });
   }
@@ -826,7 +829,10 @@ class InvitationApp {
       if (btnDelete) {
         const id = btnDelete.getAttribute('data-id');
         const person = store.people.find(p => p.id === id);
-        if (person && confirm(`Supprimer "${person.name}" ?`)) {
+        const displayName = (person?.category === 'Amis Rafik' && this.canSeeRealNames() && (person.realName || person.familyName))
+          ? `${person.realName || person.familyName} (${person.name})`
+          : person?.name;
+        if (person && confirm(`Supprimer "${displayName}" ?`)) {
           store.deletePerson(id);
           this.showToast('Personne retirée', 'info');
         }
@@ -847,6 +853,14 @@ class InvitationApp {
     }
   }
 
+  canSeeRealNames() {
+    return !!(this.currentManager && (
+      this.currentManager.name === 'admin' ||
+      this.currentManager.name === 'rafik' ||
+      this.currentManager.role === 'superadmin'
+    ));
+  }
+
   getGroupTitleForPerson(p) {
     if (p.category === 'Famille') {
       if (p.branch) {
@@ -862,6 +876,8 @@ class InvitationApp {
       return p.familyName ? `Voisins (${p.familyName})` : 'Voisins';
     } else if (p.category === 'Amis') {
       return p.familyName ? `Amis (${p.familyName})` : 'Amis';
+    } else if (p.category === 'Amis Rafik') {
+      return p.branch ? `Amis Rafik (${p.branch})` : 'Amis Rafik';
     }
     return p.category;
   }
@@ -869,10 +885,12 @@ class InvitationApp {
   getFilteredPeople() {
     const { people } = store.getSnapshot();
     const query = this.searchQuery.toLowerCase().trim();
+    const canSee = this.canSeeRealNames();
 
     return people.filter(p => {
       const matchSearch = !query ||
         p.name.toLowerCase().includes(query) ||
+        (canSee && p.realName && p.realName.toLowerCase().includes(query)) ||
         (p.branch && p.branch.toLowerCase().includes(query)) ||
         (p.category && p.category.toLowerCase().includes(query)) ||
         (p.comment && p.comment.toLowerCase().includes(query));
@@ -903,34 +921,52 @@ class InvitationApp {
     const container = document.getElementById('branch-chips-container');
     if (!container) return;
 
-    const { branches, people } = store.getSnapshot();
+    const { branches, amisRafikBranches, people } = store.getSnapshot();
 
-    if (this.activeCategory !== 'Famille' && this.activeCategory !== 'all') {
+    if (this.activeCategory === 'Famille') {
+      container.classList.remove('hidden');
+      const branchEntries = Object.entries(branches || {}).sort((a, b) => b[1] - a[1]);
+      const famCount = people.filter(p => p.category === 'Famille').length;
+
+      container.innerHTML = `
+        <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Sous-groupes:</span>
+        <button data-branch="all" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
+          this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+        }">
+          Tous (${famCount})
+        </button>
+        ${branchEntries.map(([branch, count]) => `
+          <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
+            this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+          }">
+            ${this.escapeHtml(branch)} (${count})
+          </button>
+        `).join('')}
+      `;
+    } else if (this.activeCategory === 'Amis Rafik') {
+      container.classList.remove('hidden');
+      const branchEntries = Object.entries(amisRafikBranches || {}).sort((a, b) => b[1] - a[1]);
+      const rafikCount = people.filter(p => p.category === 'Amis Rafik').length;
+
+      container.innerHTML = `
+        <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Groupes:</span>
+        <button data-branch="all" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
+          this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+        }">
+          Tous (${rafikCount})
+        </button>
+        ${branchEntries.map(([branch, count]) => `
+          <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
+            this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+          }">
+            ${this.escapeHtml(branch)} (${count})
+          </button>
+        `).join('')}
+      `;
+    } else {
       container.classList.add('hidden');
       return;
     }
-
-    container.classList.remove('hidden');
-
-    const branchEntries = Object.entries(branches).sort((a, b) => b[1] - a[1]);
-
-    const chipsHtml = `
-      <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Sous-groupes:</span>
-      <button data-branch="all" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
-        this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
-      }">
-        Tous (${people.filter(p => p.category === 'Famille').length})
-      </button>
-      ${branchEntries.map(([branch, count]) => `
-        <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
-          this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
-        }">
-          ${this.escapeHtml(branch)} (${count})
-        </button>
-      `).join('')}
-    `;
-
-    container.innerHTML = chipsHtml;
 
     container.querySelectorAll('.branch-chip').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1017,6 +1053,8 @@ class InvitationApp {
     if (badgeVoisins) badgeVoisins.textContent = categories['Voisins'] || 0;
     const badgeAmis = document.getElementById('cat-badge-amis');
     if (badgeAmis) badgeAmis.textContent = categories['Amis'] || 0;
+    const badgeAmisRafik = document.getElementById('cat-badge-amis-rafik');
+    if (badgeAmisRafik) badgeAmisRafik.textContent = categories['Amis Rafik'] || 0;
 
     // Gender counts (reflecting active category if not 'all', or global total)
     const gCountAll = document.getElementById('gender-count-all');
@@ -1166,14 +1204,28 @@ class InvitationApp {
       bgGlow = 'bg-rose-950/10';
     }
 
+    const canSee = this.canSeeRealNames();
+    const isAmiRafik = person.category === 'Amis Rafik';
+    const realName = person.realName || (isAmiRafik ? person.familyName : '');
+
+    let nameDisplayHtml = '';
+    if (isAmiRafik && canSee && realName) {
+      nameDisplayHtml = `
+        <span class="font-bold text-white">${this.escapeHtml(realName)}</span>
+        <span class="text-[10px] text-indigo-300 font-mono ml-0.5 font-normal">(${this.escapeHtml(person.name)})</span>
+      `;
+    } else {
+      nameDisplayHtml = `<span class="font-bold text-white">${this.escapeHtml(person.name)}</span>`;
+    }
+
     return `
       <div class="p-2.5 rounded-xl border ${borderClass} ${bgGlow} transition space-y-2">
         <!-- Top Row: Name + Badges + Delete -->
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <h4 class="font-bold text-xs sm:text-sm text-white truncate">
-                ${this.escapeHtml(person.name)}
+              <h4 class="text-xs sm:text-sm truncate flex items-center gap-1 flex-wrap">
+                ${nameDisplayHtml}
               </h4>
 
               <!-- Gender Badge -->

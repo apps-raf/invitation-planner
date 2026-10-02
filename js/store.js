@@ -69,6 +69,7 @@ class Store {
         name: newRecord.name,
         category: newRecord.category,
         familyName: newRecord.family_name || '',
+        realName: newRecord.category === 'Amis Rafik' ? (newRecord.family_name || '') : '',
         branch: newRecord.branch || '',
         gender: newRecord.gender || '',
         status: newRecord.status || 'pending',
@@ -107,7 +108,7 @@ class Store {
     }
     try {
       const parsed = JSON.parse(raw);
-      if (parsed.length < 250 || !parsed.some(p => p.category === 'Belle Famille')) {
+      if (parsed.length < 350 || !parsed.some(p => p.category === 'Amis Rafik')) {
         localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
         return [...INITIAL_SPREADSHEET_PEOPLE];
       }
@@ -177,7 +178,8 @@ class Store {
       'Famille': this.people.filter(p => p.category === 'Famille').length,
       'Belle Famille': this.people.filter(p => p.category === 'Belle Famille').length,
       'Voisins': this.people.filter(p => p.category === 'Voisins').length,
-      'Amis': this.people.filter(p => p.category === 'Amis').length
+      'Amis': this.people.filter(p => p.category === 'Amis').length,
+      'Amis Rafik': this.people.filter(p => p.category === 'Amis Rafik').length
     };
 
     const branches = {};
@@ -193,11 +195,18 @@ class Store {
       branches[b] = (branches[b] || 0) + 1;
     });
 
+    const amisRafikBranches = {};
+    this.people.filter(p => p.category === 'Amis Rafik').forEach(p => {
+      const b = p.branch || 'Autres';
+      amisRafikBranches[b] = (amisRafikBranches[b] || 0) + 1;
+    });
+
     return {
       people: this.people,
       counts,
       categories,
       branches,
+      amisRafikBranches,
       config: this.config,
       isSyncing: this.isSyncing,
       cloudConnected: this.cloudConnected
@@ -227,7 +236,7 @@ class Store {
   }
 
   getAllCategoriesStats() {
-    const cats = ['Famille', 'Belle Famille', 'Voisins', 'Amis'];
+    const cats = ['Famille', 'Belle Famille', 'Voisins', 'Amis', 'Amis Rafik'];
     return cats.map(cat => {
       const list = this.people.filter(p => p.category === cat);
       const sub = (status) => {

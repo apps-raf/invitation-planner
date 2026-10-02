@@ -154,6 +154,7 @@ export async function fetchAllGuests() {
     name: row.name,
     category: row.category,
     familyName: row.family_name || '',
+    realName: row.category === 'Amis Rafik' ? (row.family_name || '') : '',
     branch: row.branch || '',
     gender: row.gender || '',
     status: row.status || 'pending',
