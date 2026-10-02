@@ -70,10 +70,9 @@ class InvitationApp {
     const nameEl = document.getElementById('header-user-name');
     const dotEl = document.getElementById('cloud-status-dot');
 
-    if (this.currentManager) {
-      if (nameEl) nameEl.textContent = this.currentManager.name;
-    } else {
-      if (nameEl) nameEl.textContent = 'Connexion';
+    if (nameEl) {
+      nameEl.textContent = '';
+      nameEl.classList.add('hidden');
     }
 
     if (dotEl) {
@@ -204,7 +203,7 @@ class InvitationApp {
         this.showChangePinModal(true);
       } else {
         authModal.classList.add('hidden');
-        this.showToast(`Bienvenue ${this.currentManager.name} !`, 'success');
+        this.showToast('Connexion réussie !', 'success');
       }
     });
 
@@ -271,7 +270,7 @@ class InvitationApp {
         this.showLoginModal();
         return;
       }
-      document.getElementById('user-modal-name').textContent = this.currentManager.name;
+      document.getElementById('user-modal-name').textContent = 'Gestionnaire actif';
       userModal.classList.remove('hidden');
     });
 
