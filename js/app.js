@@ -17,6 +17,7 @@ class InvitationApp {
   constructor() {
     this.searchQuery = '';
     this.activeFilter = 'all'; // 'all', 'invited', 'pending', 'declined'
+    this.activeGender = 'all'; // 'all', 'F', 'H'
     this.activeCategory = 'all'; // 'all', 'Famille', 'Belle Famille', 'Voisins', 'Amis'
     this.activeBranch = 'all'; // 'all' or specific branch name
     this.viewMode = store.config.viewMode || 'grouped'; // 'grouped' | 'flat'
@@ -520,6 +521,25 @@ class InvitationApp {
       });
     });
 
+    // Gender Filter pills (Tous, Femmes, Hommes)
+    document.querySelectorAll('.filter-gender-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeGender = btn.getAttribute('data-gender') || 'all';
+        document.querySelectorAll('.filter-gender-pill').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'font-bold');
+          b.classList.add('bg-slate-900', 'border', 'border-slate-800');
+          const g = b.getAttribute('data-gender');
+          if (g === 'F') b.classList.add('text-pink-300');
+          else if (g === 'H') b.classList.add('text-blue-300');
+          else b.classList.add('text-slate-300');
+        });
+
+        btn.classList.remove('bg-slate-900', 'border-slate-800', 'text-pink-300', 'text-blue-300', 'text-slate-300');
+        btn.classList.add('bg-indigo-600', 'text-white', 'font-bold');
+        this.renderList();
+      });
+    });
+
     // Toggle Collapse / Expand all groups
     document.getElementById('btn-collapse-all')?.addEventListener('click', () => {
       this.allCollapsed = !this.allCollapsed;
@@ -723,8 +743,9 @@ class InvitationApp {
       }
 
       const matchStatus = this.activeFilter === 'all' || p.status === this.activeFilter;
+      const matchGender = this.activeGender === 'all' || p.gender === this.activeGender;
 
-      return matchSearch && matchCategory && matchBranch && matchStatus;
+      return matchSearch && matchCategory && matchBranch && matchStatus && matchGender;
     });
   }
 
@@ -778,7 +799,7 @@ class InvitationApp {
   }
 
   render() {
-    const { counts, categories } = store.getSnapshot();
+    const { counts, categories, people } = store.getSnapshot();
 
     // Top counts
     const totalEl = document.getElementById('count-total');
@@ -801,6 +822,19 @@ class InvitationApp {
     if (badgeVoisins) badgeVoisins.textContent = categories['Voisins'] || 0;
     const badgeAmis = document.getElementById('cat-badge-amis');
     if (badgeAmis) badgeAmis.textContent = categories['Amis'] || 0;
+
+    // Gender counts (reflecting active category if not 'all', or global total)
+    const catPeople = this.activeCategory === 'all'
+      ? people
+      : people.filter(p => p.category === this.activeCategory);
+
+    const gCountAll = document.getElementById('gender-count-all');
+    const gCountF = document.getElementById('gender-count-f');
+    const gCountH = document.getElementById('gender-count-h');
+
+    if (gCountAll) gCountAll.textContent = `(${catPeople.length})`;
+    if (gCountF) gCountF.textContent = `(${catPeople.filter(p => p.gender === 'F').length})`;
+    if (gCountH) gCountH.textContent = `(${catPeople.filter(p => p.gender === 'H').length})`;
 
     this.updateUserHeaderUI();
     this.updateViewModeUI();
