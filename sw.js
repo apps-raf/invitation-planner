@@ -1,17 +1,12 @@
-const CACHE_NAME = 'invitrack-cache-v1';
+const CACHE_NAME = 'invitrack-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/style.css',
   './js/store.js',
-  './js/utils.js',
+  './js/googleSync.js',
   './js/app.js',
-  './js/views/dashboard.js',
-  './js/views/guests.js',
-  './js/views/invitations.js',
-  './js/views/checkin.js',
-  './js/views/settings.js',
   './icons/icon.svg'
 ];
 
@@ -40,7 +35,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first, falling back to cache
+  // Avoid caching google sheets API requests
+  if (event.request.url.includes('script.google.com') || event.request.url.includes('google.com')) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {

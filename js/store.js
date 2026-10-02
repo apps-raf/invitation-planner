@@ -1,119 +1,77 @@
 /**
- * Reactive data store for Invitation Planner
+ * Streamlined Store for Invitation Tracking
  */
 
-const STORAGE_KEY_GUESTS = 'invitrack_guests_v1';
-const STORAGE_KEY_SETTINGS = 'invitrack_settings_v1';
+import { GoogleSheetSync } from './googleSync.js';
 
-const DEFAULT_SETTINGS = {
-  eventName: "Mariage de Célina & Thomas",
-  eventDate: "2026-07-18",
-  eventTime: "15:30",
-  venue: "Château de la Fontaine, 77000 Melun",
-  rsvpDeadline: "2026-06-01",
-  invitationUrl: "https://celina-mariage.github.io/invitation/",
-  whatsappTemplate: "Bonjour {name} ! ✨\n\nNous avons l'immense joie de vous inviter à notre événement : {event_name}.\n\n📅 Date : {date} à {time}\n📍 Lieu : {venue}\n👥 Nombre de places réservées : {seats}\n\n👉 Découvrez votre invitation interactive et confirmez votre présence ici :\n{invitation_url}?guest={guest_id}\n\nMerci de nous donner votre réponse avant le {rsvp_deadline}. À très bientôt !"
-};
+const STORAGE_KEY_PEOPLE = 'invitrack_streamlined_people_v2';
+const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v2';
 
-const SAMPLE_GUESTS = [
+const SAMPLE_PEOPLE = [
   {
-    id: "g_1",
-    name: "Alexandre Dumas & Famille",
-    phone: "+33612345678",
-    email: "alexandre.d@example.com",
-    category: "Famille Marié",
-    seats: 3,
-    table: "Table d'Honneur",
-    notes: "1 menu végétarien",
-    status: "confirmed",
-    sentAt: "2026-05-10T10:00:00.000Z",
-    confirmedAt: "2026-05-12T14:30:00.000Z",
-    checkedIn: false
+    id: "p_1",
+    name: "Alexandre Dumas",
+    category: "Famille",
+    status: "invited",
+    invitedAt: "2026-05-12T14:30:00.000Z",
+    comment: ""
   },
   {
-    id: "g_2",
+    id: "p_2",
     name: "Sophie Marceau",
-    phone: "+33698765432",
-    email: "sophie.m@example.com",
-    category: "Témoins",
-    seats: 2,
-    table: "Table 1 - Les Roses",
-    notes: "Sans gluten",
-    status: "confirmed",
-    sentAt: "2026-05-10T10:05:00.000Z",
-    confirmedAt: "2026-05-11T09:15:00.000Z",
-    checkedIn: false
-  },
-  {
-    id: "g_3",
-    name: "Lucas & Chloé Bernard",
-    phone: "+33655443322",
-    email: "lucas.b@example.com",
     category: "Amis",
-    seats: 2,
-    table: "Table 2 - Les Étoiles",
-    notes: "",
-    status: "sent",
-    sentAt: "2026-05-11T16:20:00.000Z",
-    confirmedAt: null,
-    checkedIn: false
+    status: "invited",
+    invitedAt: "2026-05-14T09:15:00.000Z",
+    comment: ""
   },
   {
-    id: "g_4",
-    name: "Famille Martin (Pierre & Lucie)",
-    phone: "+33677889900",
-    email: "pierre.martin@example.com",
-    category: "Famille Mariée",
-    seats: 4,
-    table: "Table 3 - Les Lys",
-    notes: "2 menus enfants",
-    status: "delivered",
-    sentAt: "2026-05-11T16:25:00.000Z",
-    confirmedAt: null,
-    checkedIn: false
+    id: "p_3",
+    name: "Lucas Bernard",
+    category: "Amis",
+    status: "pending",
+    invitedAt: null,
+    comment: "À confirmer selon budget"
   },
   {
-    id: "g_5",
-    name: "Dr. Julien Girard",
-    phone: "+33611223344",
-    email: "j.girard@example.com",
+    id: "p_4",
+    name: "Pierre & Lucie Martin",
+    category: "Famille",
+    status: "invited",
+    invitedAt: "2026-05-16T18:00:00.000Z",
+    comment: ""
+  },
+  {
+    id: "p_5",
+    name: "Julien Girard",
     category: "Collègues",
-    seats: 1,
-    table: "Table 4 - Les Oliviers",
-    notes: "",
-    status: "draft",
-    sentAt: null,
-    confirmedAt: null,
-    checkedIn: false
+    status: "declined",
+    invitedAt: null,
+    comment: "Pas vu depuis plus de 2 ans"
   },
   {
-    id: "g_6",
-    name: "Claire & Vincent Dubois",
-    phone: "+33644556677",
-    email: "vincent.dubois@example.com",
+    id: "p_6",
+    name: "Claire Dubois",
     category: "Amis",
-    seats: 2,
-    table: "",
-    notes: "Empêchement professionnel à l'étranger",
-    status: "declined",
-    sentAt: "2026-05-10T11:00:00.000Z",
-    confirmedAt: "2026-05-13T18:00:00.000Z",
-    checkedIn: false
+    status: "pending",
+    invitedAt: null,
+    comment: ""
   }
 ];
 
 class Store {
   constructor() {
     this.subscribers = [];
-    this.guests = this.loadGuests();
-    this.settings = this.loadSettings();
+    this.people = this.loadPeople();
+    this.config = this.loadConfig();
+    this.syncService = new GoogleSheetSync(this.config);
+    this.isSyncing = false;
   }
 
-  loadGuests() {
-    const raw = localStorage.getItem(STORAGE_KEY_GUESTS);
+  loadPeople() {
+    const raw = localStorage.getItem(STORAGE_KEY_PEOPLE);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY_GUESTS, JSON.stringify(SAMPLE_GUESTS));
-      return [...SAMPLE_GUESTS];
+      localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(SAMPLE_PEOPLE));
+      return [...SAMPLE_PEOPLE];
     }
     try {
       return JSON.parse(raw);
@@ -122,27 +80,31 @@ class Store {
     }
   }
 
-  loadSettings() {
-    const raw = localStorage.getItem(STORAGE_KEY_SETTINGS);
+  loadConfig() {
+    const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
-      return { ...DEFAULT_SETTINGS };
+      return {
+        endpointUrl: '',
+        sheetCsvUrl: '',
+        lastSync: null
+      };
     }
     try {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+      return JSON.parse(raw);
     } catch {
-      return { ...DEFAULT_SETTINGS };
+      return { endpointUrl: '', sheetCsvUrl: '', lastSync: null };
     }
   }
 
-  saveGuests() {
-    localStorage.setItem(STORAGE_KEY_GUESTS, JSON.stringify(this.guests));
+  save() {
+    localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(this.people));
     this.notify();
   }
 
-  saveSettings(newSettings) {
-    this.settings = { ...this.settings, ...newSettings };
-    localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(this.settings));
+  saveConfig(newConfig) {
+    this.config = { ...this.config, ...newConfig };
+    localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(this.config));
+    this.syncService = new GoogleSheetSync(this.config);
     this.notify();
   }
 
@@ -154,148 +116,165 @@ class Store {
   }
 
   notify() {
-    this.subscribers.forEach(cb => cb(this.getSnapshot()));
+    const snapshot = this.getSnapshot();
+    this.subscribers.forEach(cb => cb(snapshot));
   }
 
   getSnapshot() {
-    return {
-      guests: this.guests,
-      settings: this.settings,
-      stats: this.calculateStats()
-    };
-  }
-
-  // --- Guest CRUD actions ---
-
-  addGuest(guestData) {
-    const newGuest = {
-      id: 'g_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
-      name: guestData.name.trim(),
-      phone: (guestData.phone || '').trim(),
-      email: (guestData.email || '').trim(),
-      category: guestData.category || 'Général',
-      seats: parseInt(guestData.seats) || 1,
-      table: (guestData.table || '').trim(),
-      notes: (guestData.notes || '').trim(),
-      status: guestData.status || 'draft',
-      sentAt: guestData.status === 'sent' ? new Date().toISOString() : null,
-      confirmedAt: guestData.status === 'confirmed' ? new Date().toISOString() : null,
-      checkedIn: false
-    };
-
-    this.guests.unshift(newGuest);
-    this.saveGuests();
-    return newGuest;
-  }
-
-  updateGuest(id, updateData) {
-    const idx = this.guests.findIndex(g => g.id === id);
-    if (idx !== -1) {
-      const current = this.guests[idx];
-      // Auto-set timestamps if status changes
-      if (updateData.status && updateData.status !== current.status) {
-        if (updateData.status === 'sent' && !current.sentAt) {
-          updateData.sentAt = new Date().toISOString();
-        } else if (updateData.status === 'confirmed' && !current.confirmedAt) {
-          updateData.confirmedAt = new Date().toISOString();
-        }
-      }
-      this.guests[idx] = { ...current, ...updateData };
-      this.saveGuests();
-      return this.guests[idx];
-    }
-    return null;
-  }
-
-  deleteGuest(id) {
-    this.guests = this.guests.filter(g => g.id !== id);
-    this.saveGuests();
-  }
-
-  updateStatus(id, newStatus) {
-    return this.updateGuest(id, { status: newStatus });
-  }
-
-  toggleCheckIn(id) {
-    const guest = this.guests.find(g => g.id === id);
-    if (guest) {
-      return this.updateGuest(id, { checkedIn: !guest.checkedIn });
-    }
-    return null;
-  }
-
-  importBatchGuests(importedGuests) {
-    if (!Array.isArray(importedGuests) || importedGuests.length === 0) return 0;
-    this.guests = [...importedGuests, ...this.guests];
-    this.saveGuests();
-    return importedGuests.length;
-  }
-
-  resetToDefault() {
-    this.guests = [...SAMPLE_GUESTS];
-    this.settings = { ...DEFAULT_SETTINGS };
-    this.saveGuests();
-    this.saveSettings(this.settings);
-  }
-
-  clearAllData() {
-    this.guests = [];
-    this.saveGuests();
-  }
-
-  // --- Statistics Calculation ---
-  calculateStats() {
-    const totalInvitations = this.guests.length;
-    let totalSeats = 0;
-    let confirmedSeats = 0;
-    let declinedSeats = 0;
-    let pendingSeats = 0;
-    let checkedInSeats = 0;
-
     const counts = {
-      draft: 0,
-      sent: 0,
-      delivered: 0,
-      confirmed: 0,
-      declined: 0
+      total: this.people.length,
+      invited: this.people.filter(p => p.status === 'invited').length,
+      pending: this.people.filter(p => p.status === 'pending').length,
+      declined: this.people.filter(p => p.status === 'declined').length
     };
-
-    const categories = {};
-
-    this.guests.forEach(g => {
-      const seats = parseInt(g.seats) || 1;
-      totalSeats += seats;
-
-      const st = g.status || 'draft';
-      counts[st] = (counts[st] || 0) + 1;
-
-      if (st === 'confirmed') confirmedSeats += seats;
-      else if (st === 'declined') declinedSeats += seats;
-      else pendingSeats += seats;
-
-      if (g.checkedIn) checkedInSeats += seats;
-
-      const cat = g.category || 'Non classé';
-      categories[cat] = (categories[cat] || 0) + seats;
-    });
-
-    const sentCount = counts.sent + counts.delivered + counts.confirmed + counts.declined;
-    const responseRate = totalInvitations > 0 ? Math.round(((counts.confirmed + counts.declined) / totalInvitations) * 100) : 0;
-    const confirmationRate = totalInvitations > 0 ? Math.round((counts.confirmed / totalInvitations) * 100) : 0;
 
     return {
-      totalInvitations,
-      totalSeats,
-      sentCount,
-      confirmedSeats,
-      declinedSeats,
-      pendingSeats,
-      checkedInSeats,
-      responseRate,
-      confirmationRate,
+      people: this.people,
       counts,
-      categories
+      config: this.config,
+      isSyncing: this.isSyncing
     };
+  }
+
+  // --- Actions ---
+
+  addPerson(name, category = 'Général', status = 'pending', comment = '') {
+    if (!name || !name.trim()) return null;
+
+    const newPerson = {
+      id: 'p_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+      name: name.trim(),
+      category: category.trim() || 'Général',
+      status: status || 'pending',
+      invitedAt: status === 'invited' ? new Date().toISOString() : null,
+      comment: (comment || '').trim()
+    };
+
+    this.people.unshift(newPerson);
+    this.save();
+
+    // Background push to Google Sheet if configured
+    if (this.config.endpointUrl) {
+      this.syncService.saveGuestToSheet(newPerson).catch(console.error);
+    }
+
+    return newPerson;
+  }
+
+  markInvited(id) {
+    const person = this.people.find(p => p.id === id);
+    if (!person) return null;
+
+    person.status = 'invited';
+    person.invitedAt = new Date().toISOString();
+    this.save();
+
+    if (this.config.endpointUrl) {
+      this.syncService.saveGuestToSheet(person).catch(console.error);
+    }
+
+    return person;
+  }
+
+  markDeclined(id, comment = '') {
+    const person = this.people.find(p => p.id === id);
+    if (!person) return null;
+
+    person.status = 'declined';
+    person.invitedAt = null;
+    if (comment !== undefined) {
+      person.comment = comment.trim();
+    }
+    this.save();
+
+    if (this.config.endpointUrl) {
+      this.syncService.saveGuestToSheet(person).catch(console.error);
+    }
+
+    return person;
+  }
+
+  markPending(id) {
+    const person = this.people.find(p => p.id === id);
+    if (!person) return null;
+
+    person.status = 'pending';
+    person.invitedAt = null;
+    this.save();
+
+    if (this.config.endpointUrl) {
+      this.syncService.saveGuestToSheet(person).catch(console.error);
+    }
+
+    return person;
+  }
+
+  updateComment(id, comment) {
+    const person = this.people.find(p => p.id === id);
+    if (!person) return null;
+
+    person.comment = (comment || '').trim();
+    this.save();
+
+    if (this.config.endpointUrl) {
+      this.syncService.saveGuestToSheet(person).catch(console.error);
+    }
+
+    return person;
+  }
+
+  deletePerson(id) {
+    this.people = this.people.filter(p => p.id !== id);
+    this.save();
+  }
+
+  // Sync from Google Sheet
+  async syncFromGoogleSheet() {
+    this.isSyncing = true;
+    this.notify();
+
+    try {
+      let imported = [];
+      if (this.config.endpointUrl) {
+        imported = await this.syncService.fetchFromAppsScript(this.config.endpointUrl);
+      } else if (this.config.sheetCsvUrl) {
+        imported = await this.syncService.fetchFromPublishedCSV(this.config.sheetCsvUrl);
+      }
+
+      if (imported && imported.length > 0) {
+        // Merge strategy: update existing by name or add new
+        const map = new Map();
+        // Existing
+        this.people.forEach(p => map.set(p.name.toLowerCase().trim(), p));
+        // Overwrite or insert from Google Sheets
+        imported.forEach(p => {
+          const key = p.name.toLowerCase().trim();
+          if (map.has(key)) {
+            const existing = map.get(key);
+            existing.category = p.category || existing.category;
+            existing.status = p.status || existing.status;
+            existing.comment = p.comment || existing.comment;
+            if (p.invitedAt) existing.invitedAt = p.invitedAt;
+          } else {
+            map.set(key, p);
+          }
+        });
+
+        this.people = Array.from(map.values());
+        this.config.lastSync = new Date().toISOString();
+        this.saveConfig({ lastSync: this.config.lastSync });
+        this.save();
+        return { success: true, count: this.people.length };
+      } else {
+        return { success: false, message: 'Aucune donnée trouvée dans la feuille.' };
+      }
+    } catch (err) {
+      console.error('Google Sheet sync error:', err);
+      return { success: false, message: err.message };
+    } finally {
+      this.isSyncing = false;
+      this.notify();
+    }
   }
 }
 

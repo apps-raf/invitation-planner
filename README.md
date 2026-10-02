@@ -1,13 +1,20 @@
-# Invitation Planner & Management App
+# InviTrack - Suivi Rapide d'Invitations
 
-A comprehensive invitation tracking and guest management application.
+Application web mobile ultra-légère conçue pour suivre facilement qui est invité, à décider ou non invité, avec recherche instantanée et synchronisation directe Google Sheets.
 
-## Key Features
-- **Guest Management**: Track invited people, contact details, tags (Family, Friends, VIP, etc.), plus-ones, and table assignments.
-- **Invitation Status Tracking**: Track draft, sent, delivered, opened, confirmed, or declined statuses.
-- **Quick Send & Dispatch**: 1-click WhatsApp message generation with personalized invitation links, SMS, or email dispatch.
-- **Interactive Dashboard**: Real-time stats on RSVP rates, guest attendance, meal choices, and invitation delivery status.
-- **Import & Export**: Support for CSV/Excel guest lists and exportable attendance reports.
+## 🚀 Fonctionnalités Clés
+- **Recherche Spotlight Instantanée** : Tapez le nom d'une personne dans la barre de recherche et cochez son statut immédiatement.
+- **Ajout Direct** : Si la personne n'existe pas, ajoutez-la en 1 clic directement depuis la barre de recherche.
+- **3 États Simples** :
+  - 🟢 **Invité** : Enregistre automatiquement la date et l'heure de l'invitation.
+  - 🟡 **À décider** : Pour les personnes en cours de réflexion.
+  - 🔴 **Non invité (Écarté)** : Avec possibilité de saisir une raison/note optionnelle (*Hors budget, Trop loin, etc.*).
+- **Synchronisation Google Sheets 2 Sens** : Connectez votre Google Spreadsheet via le script `google_apps_script.js` inclus. Vos changements sur téléphone se répercutent automatiquement dans votre tableau !
+- **PWA & Hors-Ligne** : Fonctionne sans connexion internet grâce au Service Worker et s'installe sur smartphone comme une application native.
 
-## Connected Repository
-- GitHub: [celina-mariage/invitation-planner](https://github.com/celina-mariage/invitation-planner)
+## 📊 Liaison Google Sheets
+1. Ouvrez votre tableau Google Sheets.
+2. Allez dans **Extensions > Apps Script**.
+3. Copiez-collez le contenu de [`google_apps_script.js`](./google_apps_script.js).
+4. Cliquez sur **Déployer > Nouveau déploiement** (Application Web, Accès : Tout le monde).
+5. Collez l'URL dans l'application InviTrack (bouton en haut à droite).
