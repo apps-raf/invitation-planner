@@ -863,12 +863,11 @@ class InvitationApp {
 
   getGroupTitleForPerson(p) {
     if (p.category === 'Famille') {
-      if (p.branch) {
-        return `Branche ${p.branch}`;
-      } else if (p.familyName && p.familyName !== 'Ourahmoune') {
-        return `Famille ${p.familyName}`;
+      const fam = p.familyName || 'Ourahmoune';
+      if (fam === 'Ourahmoune') {
+        return p.branch ? `Ourahmoune (Branche ${p.branch})` : 'Ourahmoune (Direct)';
       } else {
-        return 'Famille Ourahmoune (Direct)';
+        return p.branch ? `Famille ${fam} (${p.branch})` : `Famille ${fam}`;
       }
     } else if (p.category === 'Belle Famille') {
       return 'Belle Famille (Izri)';
@@ -890,6 +889,7 @@ class InvitationApp {
     return people.filter(p => {
       const matchSearch = !query ||
         p.name.toLowerCase().includes(query) ||
+        (p.familyName && p.familyName.toLowerCase().includes(query)) ||
         (canSee && p.realName && p.realName.toLowerCase().includes(query)) ||
         (p.branch && p.branch.toLowerCase().includes(query)) ||
         (p.category && p.category.toLowerCase().includes(query)) ||
@@ -900,7 +900,11 @@ class InvitationApp {
       let matchBranch = true;
       if (this.activeBranch !== 'all') {
         const groupTitle = this.getGroupTitleForPerson(p);
-        matchBranch = (p.branch === this.activeBranch) || (groupTitle === this.activeBranch);
+        const famName = p.familyName || (p.category === 'Famille' ? 'Ourahmoune' : '');
+        matchBranch = (p.branch === this.activeBranch) ||
+                      (famName === this.activeBranch) ||
+                      (groupTitle === this.activeBranch) ||
+                      (groupTitle.toLowerCase().includes(this.activeBranch.toLowerCase()));
       }
 
       const matchStatus = this.activeFilter === 'all' || p.status === this.activeFilter;
@@ -921,25 +925,29 @@ class InvitationApp {
     const container = document.getElementById('branch-chips-container');
     if (!container) return;
 
-    const { branches, amisRafikBranches, people } = store.getSnapshot();
+    const { familleFamilies, amisRafikBranches, people } = store.getSnapshot();
 
     if (this.activeCategory === 'Famille') {
       container.classList.remove('hidden');
-      const branchEntries = Object.entries(branches || {}).sort((a, b) => b[1] - a[1]);
       const famCount = people.filter(p => p.category === 'Famille').length;
+      const famEntries = Object.entries(familleFamilies || {}).sort((a, b) => {
+        if (a[0] === 'Ourahmoune') return -1;
+        if (b[0] === 'Ourahmoune') return 1;
+        return b[1] - a[1];
+      });
 
       container.innerHTML = `
-        <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Sous-groupes:</span>
-        <button data-branch="all" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
+        <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Famille :</span>
+        <button data-branch="all" class="branch-chip px-2.5 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
           this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
         }">
-          Tous (${famCount})
+          Toutes (${famCount})
         </button>
-        ${branchEntries.map(([branch, count]) => `
-          <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
-            this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
+        ${famEntries.map(([fam, count]) => `
+          <button data-branch="${this.escapeAttr(fam)}" class="branch-chip px-2.5 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
+            this.activeBranch === fam ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
           }">
-            ${this.escapeHtml(branch)} (${count})
+            ${this.escapeHtml(fam)} (${count})
           </button>
         `).join('')}
       `;

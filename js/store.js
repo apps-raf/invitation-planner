@@ -183,14 +183,17 @@ class Store {
     };
 
     const branches = {};
+    const familleFamilies = {};
+
     this.people.filter(p => p.category === 'Famille').forEach(p => {
+      const fam = p.familyName || 'Ourahmoune';
+      familleFamilies[fam] = (familleFamilies[fam] || 0) + 1;
+
       let b = '';
-      if (p.branch) {
-        b = `Branche ${p.branch}`;
-      } else if (p.familyName && p.familyName !== 'Ourahmoune') {
-        b = `Famille ${p.familyName}`;
+      if (fam === 'Ourahmoune') {
+        b = p.branch ? `Ourahmoune (Branche ${p.branch})` : 'Ourahmoune (Direct)';
       } else {
-        b = 'Famille Ourahmoune (Membres directs)';
+        b = p.branch ? `Famille ${fam} (${p.branch})` : `Famille ${fam}`;
       }
       branches[b] = (branches[b] || 0) + 1;
     });
@@ -206,6 +209,7 @@ class Store {
       counts,
       categories,
       branches,
+      familleFamilies,
       amisRafikBranches,
       config: this.config,
       isSyncing: this.isSyncing,
