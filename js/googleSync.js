@@ -1,10 +1,11 @@
 /**
- * Google Sheets Universal Connector & Synchronizer
+ * Google Sheets Universal Connector & Synchronizer (v3)
  *
  * Supports:
  * 1. Direct Google Spreadsheet URLs (https://docs.google.com/spreadsheets/d/.../edit)
  * 2. Published Google Sheet CSV URLs (https://docs.google.com/spreadsheets/d/e/.../pub?output=csv)
  * 3. Google Apps Script Web App URLs (https://script.google.com/macros/s/.../exec)
+ * 4. Specific structure matching: Catégorie, Nom_Famille, Branche, Sexe, Nom_Prenom_Info, Invitation Sent
  */
 
 export class GoogleSheetSync {
@@ -31,7 +32,6 @@ export class GoogleSheetSync {
       const gidMatch = trimmed.match(/[?&#]gid=([0-9]+)/);
       const gid = gidMatch ? gidMatch[1] : '0';
 
-      // Use Google Visualization API CSV export - works seamlessly with public/shared sheets
       const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
       return { type: 'sheet_direct', sheetId, gid, url: csvUrl, original: trimmed };
     }
@@ -83,14 +83,13 @@ export class GoogleSheetSync {
       }
 
       const text = await res.text();
-      // Check if Google returned an HTML login page instead of CSV
       if (text.trim().startsWith('<!DOCTYPE html>') || text.includes('accounts.google.com')) {
         throw new Error('Votre Google Sheet demande une connexion. Cliquez sur "Partager" dans Google Sheets et choisissez : "Tous les utilisateurs disposant du lien peuvent consulter".');
       }
 
       const parsed = this.parseSheetCSV(text);
       if (parsed.guests.length === 0) {
-        throw new Error('Aucun nom trouvé dans le tableau. Vérifiez que votre tableau contient au moins une colonne "Nom" ou "Prénom".');
+        throw new Error('Aucun invité trouvé dans le tableau. Vérifiez que votre tableau contient des données.');
       }
 
       return {
@@ -131,12 +130,11 @@ export class GoogleSheetSync {
     }
   }
 
-  // Parse CSV text with high tolerance for varied column names
+  // Parse CSV text with high tolerance for varied column structures
   parseSheetCSV(csvText) {
     const rawLines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
     if (rawLines.length === 0) return { guests: [], detectedHeaders: [] };
 
-    // Helper to parse CSV row respecting quotes
     const parseRow = (line) => {
       const result = [];
       let current = '';
@@ -164,22 +162,18 @@ export class GoogleSheetSync {
     const headerRow = parseRow(rawLines[0]);
     const headers = headerRow.map(h => h.toLowerCase().replace(/[^a-z0-9à-ÿ]/g, ''));
 
-    // Dynamic column finding
-    const prenomIdx = headers.findIndex(h => h.includes('prenom') || h.includes('firstname'));
-    const nomIdx = headers.findIndex(h => h === 'nom' || h.includes('lastname') || h.includes('famille'));
-    const fullNameIdx = headers.findIndex(h => h.includes('nomcomplet') || h.includes('fullname') || h.includes('invite') || h.includes('personne') || h.includes('contact') || h.includes('nom'));
-    
-    const categoryIdx = headers.findIndex(h => h.includes('groupe') || h.includes('categorie') || h.includes('cat') || h.includes('cote') || h.includes('table') || h.includes('cercle') || h.includes('relation'));
-    const statusIdx = headers.findIndex(h => h.includes('statut') || h.includes('status') || h.includes('invite') || h.includes('presence') || h.includes('etat') || h.includes('reponse') || h.includes('decision') || h.includes('confir'));
-    const dateIdx = headers.findIndex(h => h.includes('date') || h.includes('timestamp') || h.includes('quand'));
-    const noteIdx = headers.findIndex(h => h.includes('commentaire') || h.includes('comment') || h.includes('note') || h.includes('remarque') || h.includes('raison') || h.includes('motif') || h.includes('pourquoi'));
+    // Check specific columns matching user's exact sheet
+    const nomFamilleIdx = headers.findIndex(h => h.includes('nomfamille') || h === 'nom' || h.includes('famille'));
+    const prenomInfoIdx = headers.findIndex(h => h.includes('nomprenominfo') || h.includes('prenom') || h.includes('info'));
+    const brancheIdx = headers.findIndex(h => h.includes('branche'));
+    const categorieIdx = headers.findIndex(h => h.includes('categorie') || h.includes('groupe') || h.includes('cat'));
+    const invSentIdx = headers.findIndex(h => h.includes('invitationsent') || h.includes('statut') || h.includes('status') || h.includes('invite'));
 
     const detected = [];
-    if (prenomIdx !== -1 && nomIdx !== -1) detected.push(`Prénom (${headerRow[prenomIdx]}) + Nom (${headerRow[nomIdx]})`);
-    else if (fullNameIdx !== -1) detected.push(`Nom (${headerRow[fullNameIdx]})`);
-    if (categoryIdx !== -1) detected.push(`Groupe (${headerRow[categoryIdx]})`);
-    if (statusIdx !== -1) detected.push(`Statut (${headerRow[statusIdx]})`);
-    if (noteIdx !== -1) detected.push(`Commentaire (${headerRow[noteIdx]})`);
+    if (prenomInfoIdx !== -1 && nomFamilleIdx !== -1) detected.push(`Prénom/Info (${headerRow[prenomInfoIdx]}) + Nom (${headerRow[nomFamilleIdx]})`);
+    else if (nomFamilleIdx !== -1) detected.push(`Nom (${headerRow[nomFamilleIdx]})`);
+    if (categorieIdx !== -1) detected.push(`Catégorie (${headerRow[categorieIdx]})`);
+    if (brancheIdx !== -1) detected.push(`Branche (${headerRow[brancheIdx]})`);
 
     const guests = [];
 
@@ -187,38 +181,54 @@ export class GoogleSheetSync {
       const row = parseRow(rawLines[i]);
       const val = (idx) => (idx !== -1 && row[idx]) ? row[idx].trim() : '';
 
-      // Determine Name
+      const famille = val(nomFamilleIdx);
+      const prenomInfo = val(prenomInfoIdx);
+      const branche = val(brancheIdx);
+      const cat = val(categorieIdx);
+      const invSent = val(invSentIdx);
+
+      // Build Name
       let name = '';
-      if (prenomIdx !== -1 && nomIdx !== -1 && (row[prenomIdx] || row[nomIdx])) {
-        name = `${val(prenomIdx)} ${val(nomIdx)}`.trim();
-      } else if (fullNameIdx !== -1) {
-        name = val(fullNameIdx);
-      } else if (nomIdx !== -1) {
-        name = val(nomIdx);
+      if (prenomInfo && prenomInfo.replace('.0', '').match(/^\d+$/)) {
+        const num = prenomInfo.replace('.0', '');
+        name = famille ? `${famille} #${num}` : `Invité #${num}`;
+      } else if (prenomInfo && famille) {
+        name = `${prenomInfo} ${famille}`;
+      } else if (prenomInfo) {
+        name = prenomInfo;
+      } else if (famille) {
+        name = famille;
       } else {
-        // Fallback to first non-empty column
         name = val(0) || val(1);
       }
 
-      if (!name || name.toLowerCase() === 'nom' || name.toLowerCase() === 'prénom') continue;
+      if (!name || name.toLowerCase() === 'nom' || name.toLowerCase() === 'nom_famille') continue;
 
-      const rawStatus = val(statusIdx);
-      const status = this.normalizeStatus(rawStatus);
+      let category = cat || 'Général';
+      if (category === 'z Belle Famille') category = 'Belle Famille';
+      else if (category.toUpperCase() === 'AMIS') category = 'Amis';
+      else if (category.toUpperCase() === 'VOISINS') category = 'Voisins';
+
+      let comment = '';
+      if (branche && branche.toLowerCase() !== 'pending') {
+        comment = `Branche: ${branche}`;
+      }
+
+      const status = this.normalizeStatus(invSent);
 
       guests.push({
         id: 'gs_' + i + '_' + name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10),
         name,
-        category: val(categoryIdx) || 'Général',
+        category,
         status,
-        invitedAt: val(dateIdx) || (status === 'invited' ? new Date().toISOString() : null),
-        comment: val(noteIdx) || ''
+        invitedAt: status === 'invited' ? new Date().toISOString() : null,
+        comment
       });
     }
 
     return { guests, detectedHeaders: detected };
   }
 
-  // Universal status normalizer
   normalizeStatus(val) {
     if (!val) return 'pending';
     const s = String(val).toLowerCase().trim();
@@ -234,9 +244,7 @@ export class GoogleSheetSync {
       s === 'x' ||
       s.includes('invit') ||
       s.includes('confirm') ||
-      s.includes('valid') ||
-      s.includes('présent') ||
-      s.includes('present')
+      s.includes('valid')
     ) {
       return 'invited';
     }
@@ -251,8 +259,7 @@ export class GoogleSheetSync {
       s.includes('ecart') ||
       s.includes('refus') ||
       s.includes('pas invité') ||
-      s.includes('ne pas') ||
-      s.includes('absent')
+      s.includes('ne pas')
     ) {
       return 'declined';
     }

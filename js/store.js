@@ -3,60 +3,10 @@
  */
 
 import { GoogleSheetSync } from './googleSync.js';
+import { INITIAL_SPREADSHEET_PEOPLE } from './defaultPeople.js';
 
-const STORAGE_KEY_PEOPLE = 'invitrack_streamlined_people_v2';
-const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v2';
-
-const SAMPLE_PEOPLE = [
-  {
-    id: "p_1",
-    name: "Alexandre Dumas",
-    category: "Famille",
-    status: "invited",
-    invitedAt: "2026-05-12T14:30:00.000Z",
-    comment: ""
-  },
-  {
-    id: "p_2",
-    name: "Sophie Marceau",
-    category: "Amis",
-    status: "invited",
-    invitedAt: "2026-05-14T09:15:00.000Z",
-    comment: ""
-  },
-  {
-    id: "p_3",
-    name: "Lucas Bernard",
-    category: "Amis",
-    status: "pending",
-    invitedAt: null,
-    comment: "À confirmer selon budget"
-  },
-  {
-    id: "p_4",
-    name: "Pierre & Lucie Martin",
-    category: "Famille",
-    status: "invited",
-    invitedAt: "2026-05-16T18:00:00.000Z",
-    comment: ""
-  },
-  {
-    id: "p_5",
-    name: "Julien Girard",
-    category: "Collègues",
-    status: "declined",
-    invitedAt: null,
-    comment: "Pas vu depuis plus de 2 ans"
-  },
-  {
-    id: "p_6",
-    name: "Claire Dubois",
-    category: "Amis",
-    status: "pending",
-    invitedAt: null,
-    comment: ""
-  }
-];
+const STORAGE_KEY_PEOPLE = 'invitrack_people_v3';
+const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v3';
 
 class Store {
   constructor() {
@@ -70,13 +20,20 @@ class Store {
   loadPeople() {
     const raw = localStorage.getItem(STORAGE_KEY_PEOPLE);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(SAMPLE_PEOPLE));
-      return [...SAMPLE_PEOPLE];
+      // Initialize with user's real 257 guests from their xlsx
+      localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
+      return [...INITIAL_SPREADSHEET_PEOPLE];
     }
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      // If legacy sample data is detected, replace with real guests
+      if (parsed.length <= 6 && parsed.some(p => p.name === 'Alexandre Dumas' || p.name === 'Sophie Marceau')) {
+        localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
+        return [...INITIAL_SPREADSHEET_PEOPLE];
+      }
+      return parsed;
     } catch {
-      return [];
+      return [...INITIAL_SPREADSHEET_PEOPLE];
     }
   }
 
@@ -88,7 +45,7 @@ class Store {
         endpointUrl: '',
         sheetCsvUrl: '',
         lastSync: null,
-        importMode: 'replace' // 'replace' | 'merge'
+        importMode: 'replace'
       };
     }
     try {
@@ -229,8 +186,8 @@ class Store {
     this.save();
   }
 
-  clearAll() {
-    this.people = [];
+  resetToInitialList() {
+    this.people = [...INITIAL_SPREADSHEET_PEOPLE];
     this.save();
   }
 
@@ -256,10 +213,8 @@ class Store {
       }
 
       if (mode === 'replace') {
-        // Overwrite completely with spreadsheet data (removes sample/demo data)
         this.people = imported;
       } else {
-        // Merge with existing
         const map = new Map();
         this.people.forEach(p => map.set(p.name.toLowerCase().trim(), p));
         imported.forEach(p => {
@@ -277,7 +232,6 @@ class Store {
         this.people = Array.from(map.values());
       }
 
-      // Save resolved URLs
       const resolved = GoogleSheetSync.resolveUrl(targetUrl);
       this.config.rawUrl = targetUrl;
       this.config.lastSync = new Date().toISOString();
