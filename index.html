@@ -38,7 +38,7 @@
   <div class="w-full max-w-xl min-h-screen flex flex-col pb-28 px-4 sm:px-6">
 
     <!-- Top Sticky Bar: Metrics & Google Sheets Sync -->
-    <header class="sticky top-0 z-30 pt-3 pb-2 bg-slate-950/90 backdrop-blur-xl border-b border-slate-900 flex flex-col gap-2">
+    <header class="sticky top-0 z-30 pt-3 pb-2 bg-slate-950/95 backdrop-blur-xl border-b border-slate-900 flex flex-col gap-2">
       <!-- Title & Sync Button -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -202,9 +202,8 @@
       </div>
 
       <form id="decline-form" class="space-y-3">
-        <!-- Preset quick tags -->
         <div>
-          <label class="block text-xs text-slate-400 mb-1.5">Raisons fréquentes (cliquez pour choisir) :</label>
+          <label class="block text-xs text-slate-400 mb-1.5">Raisons fréquentes :</label>
           <div class="flex flex-wrap gap-1.5">
             <button type="button" data-reason="Hors budget / Limite de places" class="preset-reason px-2.5 py-1 rounded-lg text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">Hors budget</button>
             <button type="button" data-reason="Habite trop loin" class="preset-reason px-2.5 py-1 rounded-lg text-xs bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">Trop loin</button>
@@ -214,7 +213,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Raison / Commentaire personnalisé :</label>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Raison / Commentaire :</label>
           <textarea id="decline-comment-input" rows="2" placeholder="Pourquoi avez-vous décidé de ne pas inviter ?" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-rose-500"></textarea>
         </div>
 
@@ -227,44 +226,86 @@
     </div>
   </div>
 
-  <!-- Modal: Google Sheets Connection -->
+  <!-- Modal: Google Sheets Connection & Live Diagnostic -->
   <div id="gsheet-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <span>📊 Synchronisation Google Sheets</span>
+          <span>📊 Liaison Google Sheets</span>
         </h3>
         <button id="btn-close-gsheet" class="text-slate-400 hover:text-white font-bold p-1">✕</button>
       </div>
 
-      <div class="text-xs text-slate-300 space-y-2">
-        <p>Liez votre Google Spreadsheet pour que vos invitations cochées sur téléphone se mettent à jour en direct dans votre tableau !</p>
-      </div>
-
-      <!-- Quick Step-by-Step Instructions -->
-      <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700 text-xs text-slate-300 space-y-2">
-        <p class="font-bold text-indigo-400">Comment lier en 1 minute :</p>
-        <ol class="list-decimal pl-4 space-y-1 text-slate-400">
-          <li>Dans votre Google Spreadsheet, cliquez sur <span class="text-white font-semibold">Extensions &gt; Apps Script</span>.</li>
-          <li>Collez le script fourni ci-dessous.</li>
-          <li>Cliquez sur <span class="text-white font-semibold">Déployer &gt; Nouveau déploiement</span> (Type: Application Web, Accès: Tout le monde).</li>
-          <li>Collez l'URL obtenue ci-dessous.</li>
-        </ol>
-        <button id="btn-copy-script" class="mt-2 w-full py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-semibold text-xs transition">
-          📋 Copier le code Apps Script
-        </button>
-      </div>
-
+      <!-- URL Input -->
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">URL de l'application Web Google Script (ou lien CSV publié)</label>
-        <input type="url" id="gsheet-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" />
+        <label class="block text-xs font-semibold text-slate-300 mb-1">URL de votre Google Spreadsheet</label>
+        <div class="flex gap-2">
+          <input 
+            type="url" 
+            id="gsheet-url-input" 
+            placeholder="https://docs.google.com/spreadsheets/d/.../edit" 
+            class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" 
+          />
+          <button id="btn-test-gsheet" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition shrink-0">
+            Tester
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Accepte directement votre lien de tableau <span class="text-slate-300">docs.google.com/spreadsheets/...</span> ou l'URL de votre Web App Apps Script.</p>
       </div>
 
-      <div class="pt-2">
-        <button id="btn-save-gsheet" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition">
-          Enregistrer et Synchroniser
+      <!-- Diagnostic / Test Result Container -->
+      <div id="gsheet-diag-result" class="hidden p-3 rounded-xl text-xs space-y-2 border"></div>
+
+      <!-- Import Options (Shown when test succeeds) -->
+      <div id="gsheet-import-options" class="hidden space-y-3 pt-2 border-t border-slate-800">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Mode d'importation :</label>
+          <div class="space-y-1.5">
+            <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+              <input type="radio" name="import-mode" value="replace" checked class="text-indigo-600 bg-slate-800 border-slate-700" />
+              <span><strong>Remplacer ma liste</strong> (efface les exemples démo, garde uniquement la feuille)</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+              <input type="radio" name="import-mode" value="merge" class="text-indigo-600 bg-slate-800 border-slate-700" />
+              <span><strong>Fusionner</strong> (conserve les personnes déjà ajoutées)</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="btn-confirm-import" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition">
+          Valider et Importer dans l'App
         </button>
       </div>
+
+      <!-- Advanced Two-way Apps Script Accordion -->
+      <div class="pt-2 border-t border-slate-800">
+        <details class="text-xs text-slate-400 group">
+          <summary class="cursor-pointer font-semibold text-indigo-400 hover:text-indigo-300 py-1">
+            ⚙️ Vous voulez la mise à jour 2-sens en direct ? (Google Apps Script)
+          </summary>
+          <div class="mt-2 p-3 bg-slate-800/80 rounded-xl space-y-2 text-[11px] leading-relaxed">
+            <p>Le lien direct Google Sheet permet d'importer et de rafraîchir la liste à tout moment. Si vous voulez qu'une coche sur votre téléphone écrive en direct dans votre Google Sheet :</p>
+            <ol class="list-decimal pl-4 space-y-1 text-slate-300">
+              <li>Dans votre Google Sheet : <strong>Extensions > Apps Script</strong>.</li>
+              <li>Collez le code ci-dessous et cliquez sur <strong>Déployer > Nouveau déploiement</strong> (Application Web, Accès : Tout le monde).</li>
+              <li>Collez l'URL obtenue dans le champ ci-dessus !</li>
+            </ol>
+            <button id="btn-copy-script" class="mt-1 w-full py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg font-semibold transition">
+              📋 Copier le code Apps Script v2
+            </button>
+          </div>
+        </details>
+      </div>
+
+      <!-- Direct CSV Upload as fallback -->
+      <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <span>Ou fichier direct :</span>
+        <button id="btn-upload-csv" class="text-indigo-400 hover:text-indigo-300 underline font-semibold">
+          Importer un fichier .CSV
+        </button>
+        <input type="file" id="file-csv-picker" accept=".csv" class="hidden" />
+      </div>
+
     </div>
   </div>
 

@@ -1,5 +1,5 @@
 /**
- * InviTrack - Ultra-Light Mobile-First Invitation Tracker
+ * InviTrack - Ultra-Light Mobile-First Invitation Tracker (v2.1)
  */
 
 import { store } from './store.js';
@@ -9,6 +9,7 @@ class InvitationApp {
     this.searchQuery = '';
     this.activeFilter = 'all'; // 'all', 'invited', 'pending', 'declined'
     this.activeCategory = 'all';
+    this.currentTestedGuests = null;
     this.init();
   }
 
@@ -125,9 +126,15 @@ class InvitationApp {
 
     // Google Sheets Modal
     const gsheetModal = document.getElementById('gsheet-modal');
+    const diagBox = document.getElementById('gsheet-diag-result');
+    const importOptions = document.getElementById('gsheet-import-options');
+    const urlInput = document.getElementById('gsheet-url-input');
+
     document.getElementById('btn-open-gsheet')?.addEventListener('click', () => {
       const { config } = store.getSnapshot();
-      document.getElementById('gsheet-url-input').value = config.endpointUrl || config.sheetCsvUrl || '';
+      urlInput.value = config.rawUrl || config.endpointUrl || config.sheetCsvUrl || '';
+      diagBox.className = 'hidden p-3 rounded-xl text-xs space-y-2 border';
+      importOptions.classList.add('hidden');
       gsheetModal.classList.remove('hidden');
     });
 
@@ -135,38 +142,113 @@ class InvitationApp {
       gsheetModal.classList.add('hidden');
     });
 
-    document.getElementById('btn-save-gsheet')?.addEventListener('click', async () => {
-      const url = document.getElementById('gsheet-url-input').value.trim();
+    // TEST Google Sheet Connection
+    document.getElementById('btn-test-gsheet')?.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
       if (!url) {
-        this.showToast('Veuillez entrer une URL', 'warning');
+        this.showToast('Veuillez coller l\'URL de votre Google Spreadsheet', 'warning');
         return;
       }
 
-      if (url.includes('script.google.com')) {
-        store.saveConfig({ endpointUrl: url });
-      } else {
-        store.saveConfig({ sheetCsvUrl: url });
-      }
+      diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-slate-800/80 border border-slate-700 text-slate-300 animate-fade-in block';
+      diagBox.innerHTML = `
+        <div class="flex items-center gap-2 text-indigo-400 font-semibold">
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Connexion et analyse de votre feuille en cours...
+        </div>
+      `;
+      importOptions.classList.add('hidden');
 
-      this.showToast('Connexion Google Sheets configurée ! Synchronisation...', 'info');
-      const res = await store.syncFromGoogleSheet();
-      if (res.success) {
-        this.showToast(`Synchronisation réussie (${res.count} personnes) !`, 'success');
-        gsheetModal.classList.add('hidden');
+      const diag = await store.syncService.testConnection(url);
+
+      if (diag.success) {
+        this.currentTestedGuests = diag.rawGuests;
+        diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 animate-fade-in block';
+        diagBox.innerHTML = `
+          <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            Connexion réussie ! ${diag.count} personne(s) détectée(s)
+          </div>
+          ${diag.detectedHeaders ? `<div class="text-[11px] text-slate-300">Colonnes reconnues : <span class="text-white">${diag.detectedHeaders.join(', ')}</span></div>` : ''}
+          <div class="pt-1 text-[11px] text-slate-400 border-t border-emerald-900/50">
+            <p class="font-semibold text-slate-300 mb-1">Aperçu :</p>
+            ${diag.preview.map(p => `
+              <div class="truncate">• <strong>${this.escapeHtml(p.name)}</strong> (${this.escapeHtml(p.category)}) : ${p.status === 'invited' ? '🟢 Invité' : p.status === 'declined' ? '🔴 Écarté' : '🟡 À décider'}</div>
+            `).join('')}
+          </div>
+        `;
+        importOptions.classList.remove('hidden');
       } else {
-        this.showToast(`Erreur de synchronisation : ${res.message}`, 'error');
+        this.currentTestedGuests = null;
+        diagBox.className = 'p-3 rounded-xl text-xs space-y-2 bg-rose-950/40 border border-rose-500/40 text-rose-200 animate-fade-in block';
+        diagBox.innerHTML = `
+          <div class="font-bold text-rose-400 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            Impossible de charger le tableau
+          </div>
+          <div class="text-[11px] leading-relaxed text-slate-300">${diag.error}</div>
+        `;
       }
     });
 
-    // Manual sync button
+    // Confirm Import into App
+    document.getElementById('btn-confirm-import')?.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+      const mode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
+
+      this.showToast('Importation en cours...', 'info');
+      const res = await store.syncFromGoogleSheet(url, mode);
+
+      if (res.success) {
+        this.showToast(`Importation réussie : ${res.count} personne(s) chargées !`, 'success');
+        gsheetModal.classList.add('hidden');
+      } else {
+        this.showToast(`Erreur : ${res.message}`, 'error');
+      }
+    });
+
+    // Direct CSV File Upload
+    const csvPicker = document.getElementById('file-csv-picker');
+    document.getElementById('btn-upload-csv')?.addEventListener('click', () => csvPicker?.click());
+    csvPicker?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const text = evt.target.result;
+        const parsed = store.syncService.parseSheetCSV(text);
+        if (parsed.guests.length > 0) {
+          const mode = document.querySelector('input[name="import-mode"]:checked')?.value || 'replace';
+          if (mode === 'replace') {
+            store.people = parsed.guests;
+          } else {
+            parsed.guests.forEach(g => {
+              if (!store.people.some(p => p.name.toLowerCase() === g.name.toLowerCase())) {
+                store.people.push(g);
+              }
+            });
+          }
+          store.save();
+          this.showToast(`${parsed.guests.length} personnes importées depuis le CSV !`, 'success');
+          gsheetModal.classList.add('hidden');
+        } else {
+          this.showToast('Aucun nom trouvé dans ce fichier CSV', 'error');
+        }
+      };
+      reader.readAsText(file);
+      csvPicker.value = '';
+    });
+
+    // Manual Quick Sync button in header
     document.getElementById('btn-manual-sync')?.addEventListener('click', async () => {
       const { config } = store.getSnapshot();
-      if (!config.endpointUrl && !config.sheetCsvUrl) {
+      if (!config.rawUrl && !config.endpointUrl && !config.sheetCsvUrl) {
         document.getElementById('btn-open-gsheet').click();
         return;
       }
       this.showToast('Synchronisation avec Google Sheets...', 'info');
-      const res = await store.syncFromGoogleSheet();
+      const res = await store.syncFromGoogleSheet(null, config.importMode || 'replace');
       if (res.success) {
         this.showToast(`Synchronisé (${res.count} personnes) !`, 'success');
       } else {
@@ -174,62 +256,17 @@ class InvitationApp {
       }
     });
 
-    // Copy Apps Script button
-    document.getElementById('btn-copy-script')?.addEventListener('click', () => {
-      const scriptCode = `// Code Google Apps Script pour synchroniser votre Google Sheet avec InviTrack
-function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  setupHeadersIfNeeded(sheet);
-  var data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
-  var list = [];
-  for (var i = 1; i < data.length; i++) {
-    if (!data[i][0]) continue;
-    list.push({
-      id: "gs_" + i,
-      name: String(data[i][0] || ""),
-      category: String(data[i][1] || "Général"),
-      status: String(data[i][2] || "pending").toLowerCase(),
-      invitedAt: data[i][3] ? Utilities.formatDate(new Date(data[i][3]), Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'") : null,
-      comment: String(data[i][4] || "")
-    });
-  }
-  return ContentService.createTextOutput(JSON.stringify(list)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var payload = JSON.parse(e.postData.contents);
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  setupHeadersIfNeeded(sheet);
-  if (payload.action === "upsertGuest" && payload.guest) {
-    var g = payload.guest;
-    var data = sheet.getDataRange().getValues();
-    var row = -1;
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]).toLowerCase().trim() === String(g.name).toLowerCase().trim()) { row = i + 1; break; }
-    }
-    var d = g.invitedAt ? new Date(g.invitedAt).toLocaleString("fr-FR") : "";
-    if (row > 0) {
-      sheet.getRange(row, 2).setValue(g.category || "Général");
-      sheet.getRange(row, 3).setValue(g.status || "pending");
-      sheet.getRange(row, 4).setValue(g.status === "invited" ? d : "");
-      sheet.getRange(row, 5).setValue(g.comment || "");
-    } else {
-      sheet.appendRow([g.name, g.category || "Général", g.status || "pending", g.status === "invited" ? d : "", g.comment || ""]);
-    }
-    return ContentService.createTextOutput(JSON.stringify({ success: true })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function setupHeadersIfNeeded(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["Nom", "Groupe", "Statut", "Date Invitation", "Commentaire"]);
-    sheet.getRange(1, 1, 1, 5).setFontWeight("bold").setBackground("#EEF2FF");
-  }
-}`;
-      navigator.clipboard.writeText(scriptCode).then(() => {
-        this.showToast('Code Google Apps Script copié !', 'success');
-      });
+    // Copy Apps Script v2 button
+    document.getElementById('btn-copy-script')?.addEventListener('click', async () => {
+      try {
+        const res = await fetch('./google_apps_script.js');
+        const code = await res.text();
+        navigator.clipboard.writeText(code).then(() => {
+          this.showToast('Code Google Apps Script copié dans le presse-papier !', 'success');
+        });
+      } catch (err) {
+        this.showToast('Erreur lors de la copie du script', 'error');
+      }
     });
 
     // Delegated status action clicks on list items
@@ -284,16 +321,12 @@ function setupHeadersIfNeeded(sheet) {
     const query = this.searchQuery.toLowerCase().trim();
 
     return people.filter(p => {
-      // Search match
       const matchSearch = !query ||
         p.name.toLowerCase().includes(query) ||
         (p.category && p.category.toLowerCase().includes(query)) ||
         (p.comment && p.comment.toLowerCase().includes(query));
 
-      // Status filter
       const matchStatus = this.activeFilter === 'all' || p.status === this.activeFilter;
-
-      // Category filter
       const matchCategory = this.activeCategory === 'all' || p.category === this.activeCategory;
 
       return matchSearch && matchStatus && matchCategory;
@@ -318,7 +351,7 @@ function setupHeadersIfNeeded(sheet) {
     // Sync button status
     const syncStatusDot = document.getElementById('sync-status-dot');
     const syncLabel = document.getElementById('sync-label');
-    if (config.endpointUrl || config.sheetCsvUrl) {
+    if (config.rawUrl || config.endpointUrl || config.sheetCsvUrl) {
       syncStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
       syncLabel.textContent = isSyncing ? 'Synchronisation...' : 'Google Sheet Lié';
     } else {
@@ -345,7 +378,6 @@ function setupHeadersIfNeeded(sheet) {
 
     if (filtered.length === 0) {
       if (query) {
-        // Spotlight instant creation prompt!
         container.innerHTML = `
           <div class="glass-panel rounded-2xl p-6 text-center border border-indigo-500/30 animate-fade-in my-4">
             <p class="text-sm text-slate-300">Aucun résultat pour <span class="text-white font-bold">"${this.escapeHtml(query)}"</span></p>
@@ -428,7 +460,7 @@ function setupHeadersIfNeeded(sheet) {
 
           <!-- Bottom Action Buttons: Fast 3-Pill Toggle -->
           <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80">
-            <!-- 1. INVITÉ (Check) -->
+            <!-- 1. INVITÉ -->
             <button data-action="mark-invited" data-id="${person.id}" class="py-2 px-1 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 ${
               isInvited
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
@@ -492,7 +524,7 @@ function setupHeadersIfNeeded(sheet) {
       toast.style.opacity = '0';
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
-    }, 2500);
+    }, 2800);
   }
 }
 

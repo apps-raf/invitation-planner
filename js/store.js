@@ -84,15 +84,17 @@ class Store {
     const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
     if (!raw) {
       return {
+        rawUrl: '',
         endpointUrl: '',
         sheetCsvUrl: '',
-        lastSync: null
+        lastSync: null,
+        importMode: 'replace' // 'replace' | 'merge'
       };
     }
     try {
-      return JSON.parse(raw);
+      return { importMode: 'replace', ...JSON.parse(raw) };
     } catch {
-      return { endpointUrl: '', sheetCsvUrl: '', lastSync: null };
+      return { rawUrl: '', endpointUrl: '', sheetCsvUrl: '', lastSync: null, importMode: 'replace' };
     }
   }
 
@@ -153,7 +155,6 @@ class Store {
     this.people.unshift(newPerson);
     this.save();
 
-    // Background push to Google Sheet if configured
     if (this.config.endpointUrl) {
       this.syncService.saveGuestToSheet(newPerson).catch(console.error);
     }
@@ -228,25 +229,39 @@ class Store {
     this.save();
   }
 
-  // Sync from Google Sheet
-  async syncFromGoogleSheet() {
+  clearAll() {
+    this.people = [];
+    this.save();
+  }
+
+  // Import / Sync with test & preview support
+  async syncFromGoogleSheet(forcedUrl = null, mode = 'replace') {
+    const targetUrl = forcedUrl || this.config.rawUrl || this.config.endpointUrl || this.config.sheetCsvUrl;
+    if (!targetUrl) {
+      return { success: false, message: 'Aucune URL de Google Sheet configurée' };
+    }
+
     this.isSyncing = true;
     this.notify();
 
     try {
-      let imported = [];
-      if (this.config.endpointUrl) {
-        imported = await this.syncService.fetchFromAppsScript(this.config.endpointUrl);
-      } else if (this.config.sheetCsvUrl) {
-        imported = await this.syncService.fetchFromPublishedCSV(this.config.sheetCsvUrl);
+      const diag = await this.syncService.testConnection(targetUrl);
+      if (!diag.success) {
+        return { success: false, message: diag.error };
       }
 
-      if (imported && imported.length > 0) {
-        // Merge strategy: update existing by name or add new
+      const imported = diag.rawGuests || [];
+      if (imported.length === 0) {
+        return { success: false, message: 'Aucune personne trouvée dans ce tableau' };
+      }
+
+      if (mode === 'replace') {
+        // Overwrite completely with spreadsheet data (removes sample/demo data)
+        this.people = imported;
+      } else {
+        // Merge with existing
         const map = new Map();
-        // Existing
         this.people.forEach(p => map.set(p.name.toLowerCase().trim(), p));
-        // Overwrite or insert from Google Sheets
         imported.forEach(p => {
           const key = p.name.toLowerCase().trim();
           if (map.has(key)) {
@@ -259,18 +274,37 @@ class Store {
             map.set(key, p);
           }
         });
-
         this.people = Array.from(map.values());
-        this.config.lastSync = new Date().toISOString();
-        this.saveConfig({ lastSync: this.config.lastSync });
-        this.save();
-        return { success: true, count: this.people.length };
-      } else {
-        return { success: false, message: 'Aucune donnée trouvée dans la feuille.' };
       }
+
+      // Save resolved URLs
+      const resolved = GoogleSheetSync.resolveUrl(targetUrl);
+      this.config.rawUrl = targetUrl;
+      this.config.lastSync = new Date().toISOString();
+      if (resolved.type === 'appsscript') {
+        this.config.endpointUrl = resolved.url;
+      } else {
+        this.config.sheetCsvUrl = resolved.url;
+      }
+
+      this.saveConfig({
+        rawUrl: this.config.rawUrl,
+        endpointUrl: this.config.endpointUrl,
+        sheetCsvUrl: this.config.sheetCsvUrl,
+        lastSync: this.config.lastSync,
+        importMode: mode
+      });
+
+      this.save();
+      return { 
+        success: true, 
+        count: imported.length, 
+        type: diag.type, 
+        detectedHeaders: diag.detectedHeaders 
+      };
+
     } catch (err) {
-      console.error('Google Sheet sync error:', err);
-      return { success: false, message: err.message };
+      return { success: false, message: err.message || String(err) };
     } finally {
       this.isSyncing = false;
       this.notify();
