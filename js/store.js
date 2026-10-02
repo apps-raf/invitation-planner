@@ -1,11 +1,11 @@
 /**
- * Streamlined Store for Invitation Tracking (v4 without Belle Famille)
+ * Streamlined Store for Invitation Tracking (v4.1 with Accurate Hierarchy)
  */
 
 import { GoogleSheetSync } from './googleSync.js';
 import { INITIAL_SPREADSHEET_PEOPLE } from './defaultPeople.js';
 
-const STORAGE_KEY_PEOPLE = 'invitrack_people_v4';
+const STORAGE_KEY_PEOPLE = 'invitrack_people_v4_fixed';
 const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v4';
 
 class Store {
@@ -25,9 +25,8 @@ class Store {
     }
     try {
       let parsed = JSON.parse(raw);
-      // Strip any Belle Famille entries from previous storage
       parsed = parsed.filter(p => p.category !== 'Belle Famille');
-      if (parsed.length === 0) {
+      if (parsed.length === 0 || !parsed[0].hasOwnProperty('branch')) {
         localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
         return [...INITIAL_SPREADSHEET_PEOPLE];
       }
@@ -95,9 +94,17 @@ class Store {
       'Amis': this.people.filter(p => p.category === 'Amis').length
     };
 
+    // Correct branch & sub-family mapping
     const branches = {};
     this.people.filter(p => p.category === 'Famille').forEach(p => {
-      const b = p.branch || 'Autres membres';
+      let b = '';
+      if (p.branch) {
+        b = `Branche ${p.branch}`;
+      } else if (p.familyName && p.familyName !== 'Ourahmoune') {
+        b = `Famille ${p.familyName}`;
+      } else {
+        b = 'Famille Ourahmoune (Membres directs)';
+      }
       branches[b] = (branches[b] || 0) + 1;
     });
 
