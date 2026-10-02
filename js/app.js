@@ -35,6 +35,7 @@ class InvitationApp {
     this.bindEvents();
     this.bindAuthEvents();
     this.bindHistoryEvents();
+    this.bindStatsEvents();
 
     store.subscribe(() => this.render());
     store.onAuditUpdate(() => {
@@ -459,6 +460,145 @@ class InvitationApp {
     }).join('');
   }
 
+  // --- Detailed Stats Modal Handlers ---
+
+  bindStatsEvents() {
+    const statsModal = document.getElementById('stats-modal');
+    const btnOpenStats = document.getElementById('btn-open-stats');
+    const btnCloseStats = document.getElementById('btn-close-stats');
+
+    btnOpenStats?.addEventListener('click', () => {
+      statsModal?.classList.remove('hidden');
+      this.renderStatsModal();
+    });
+
+    btnCloseStats?.addEventListener('click', () => {
+      statsModal?.classList.add('hidden');
+    });
+
+    statsModal?.addEventListener('click', (e) => {
+      if (e.target === statsModal) {
+        statsModal.classList.add('hidden');
+      }
+    });
+  }
+
+  renderStatsModal() {
+    const container = document.getElementById('stats-modal-body');
+    if (!container) return;
+
+    const totalStats = store.getDetailedStats('all');
+    const catStats = store.getAllCategoriesStats();
+
+    const fPct = totalStats.total.total > 0 ? Math.round((totalStats.total.f / totalStats.total.total) * 100) : 0;
+    const hPct = totalStats.total.total > 0 ? Math.round((totalStats.total.h / totalStats.total.total) * 100) : 0;
+
+    let html = `
+      <!-- Global Overview Card -->
+      <div class="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="font-extrabold text-sm text-white">Vue d'ensemble globale</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            ${totalStats.total.total} Invités au total
+          </span>
+        </div>
+
+        <!-- Gender split bar -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px] font-semibold">
+            <span class="text-pink-300">👩 Femmes : ${totalStats.total.f} (${fPct}%)</span>
+            <span class="text-blue-300">👨 Hommes : ${totalStats.total.h} (${hPct}%)</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-900 overflow-hidden flex">
+            <div class="bg-pink-500 h-full" style="width: ${fPct}%"></div>
+            <div class="bg-blue-500 h-full" style="width: ${hPct}%"></div>
+          </div>
+        </div>
+
+        <!-- Metric grid 3 status boxes -->
+        <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+          <div class="p-2 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
+            <span class="text-[10px] text-emerald-300/80 uppercase font-semibold block">🟢 Invités</span>
+            <span class="text-base font-black text-emerald-400 block">${totalStats.invited.total}</span>
+            <div class="text-[10px] text-slate-300 mt-0.5 flex justify-center gap-1.5 font-medium">
+              <span class="text-pink-300">👩 ${totalStats.invited.f}</span>
+              <span class="text-slate-500">·</span>
+              <span class="text-blue-300">👨 ${totalStats.invited.h}</span>
+            </div>
+          </div>
+
+          <div class="p-2 rounded-xl bg-amber-950/30 border border-amber-500/30">
+            <span class="text-[10px] text-amber-300/80 uppercase font-semibold block">🟡 À décider</span>
+            <span class="text-base font-black text-amber-400 block">${totalStats.pending.total}</span>
+            <div class="text-[10px] text-slate-300 mt-0.5 flex justify-center gap-1.5 font-medium">
+              <span class="text-pink-300">👩 ${totalStats.pending.f}</span>
+              <span class="text-slate-500">·</span>
+              <span class="text-blue-300">👨 ${totalStats.pending.h}</span>
+            </div>
+          </div>
+
+          <div class="p-2 rounded-xl bg-rose-950/30 border border-rose-500/30">
+            <span class="text-[10px] text-rose-300/80 uppercase font-semibold block">🔴 Écartés</span>
+            <span class="text-base font-black text-rose-400 block">${totalStats.declined.total}</span>
+            <div class="text-[10px] text-slate-300 mt-0.5 flex justify-center gap-1.5 font-medium">
+              <span class="text-pink-300">👩 ${totalStats.declined.f}</span>
+              <span class="text-slate-500">·</span>
+              <span class="text-blue-300">👨 ${totalStats.declined.h}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Section -->
+      <div class="space-y-2 pt-1">
+        <h4 class="font-bold text-slate-200 text-xs flex items-center justify-between">
+          <span>Détail par catégorie d'invités</span>
+          <span class="text-[10px] text-slate-400 font-normal">H = Hommes / F = Femmes</span>
+        </h4>
+
+        <div class="space-y-2">
+          ${catStats.map(cs => {
+            return `
+              <div class="p-2.5 rounded-xl bg-slate-800/50 border border-slate-700/60 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-white text-xs">${this.escapeHtml(cs.category)}</span>
+                    <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-slate-700 text-slate-300">
+                      ${cs.total.total}
+                    </span>
+                  </div>
+                  <div class="text-[11px] font-semibold flex items-center gap-2">
+                    <span class="text-pink-300">👩 ${cs.total.f}</span>
+                    <span class="text-slate-600">·</span>
+                    <span class="text-blue-300">👨 ${cs.total.h}</span>
+                  </div>
+                </div>
+
+                <!-- Sub counts per status for this category -->
+                <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] pt-1 border-t border-slate-700/40">
+                  <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-lg py-1 px-1">
+                    <span class="text-emerald-300 font-bold block">${cs.invited.total} Invités</span>
+                    <span class="text-slate-400 text-[9px]">👩 ${cs.invited.f} · 👨 ${cs.invited.h}</span>
+                  </div>
+                  <div class="bg-amber-950/20 border border-amber-500/20 rounded-lg py-1 px-1">
+                    <span class="text-amber-300 font-bold block">${cs.pending.total} À décider</span>
+                    <span class="text-slate-400 text-[9px]">👩 ${cs.pending.f} · 👨 ${cs.pending.h}</span>
+                  </div>
+                  <div class="bg-rose-950/20 border border-rose-500/20 rounded-lg py-1 px-1">
+                    <span class="text-rose-300 font-bold block">${cs.declined.total} Écartés</span>
+                    <span class="text-slate-400 text-[9px]">👩 ${cs.declined.f} · 👨 ${cs.declined.h}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+  }
+
   // --- Main Events Binding ---
 
   bindEvents() {
@@ -502,21 +642,24 @@ class InvitationApp {
         btn.classList.remove('bg-slate-900', 'text-slate-400');
         btn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm', 'font-bold');
 
-        this.renderBranchChips();
-        this.renderList();
+        this.render();
       });
     });
 
     // Status Sub-filter pills (Tous, Invités, À décider, Écartés)
     document.querySelectorAll('.filter-status-pill').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.activeFilter = btn.getAttribute('data-filter');
-        document.querySelectorAll('.filter-status-pill').forEach(b => {
-          b.classList.remove('bg-slate-800', 'text-white', 'font-bold');
-          b.classList.add('text-slate-400');
-        });
-        btn.classList.add('bg-slate-800', 'text-white', 'font-bold');
-        btn.classList.remove('text-slate-400');
+        this.activeFilter = btn.getAttribute('data-filter') || 'all';
+        this.updateStatCardActiveStyles();
+        this.renderList();
+      });
+    });
+
+    // Top Stat Cards (Total, Invités, À décider, Écartés)
+    document.querySelectorAll('.stat-card').forEach(card => {
+      card.addEventListener('click', () => {
+        this.activeFilter = card.getAttribute('data-stat-status') || 'all';
+        this.updateStatCardActiveStyles();
         this.renderList();
       });
     });
@@ -798,22 +941,74 @@ class InvitationApp {
     });
   }
 
-  render() {
-    const { counts, categories, people } = store.getSnapshot();
+  updateStatCardActiveStyles() {
+    document.querySelectorAll('.stat-card').forEach(card => {
+      const st = card.getAttribute('data-stat-status');
+      if (st === this.activeFilter) {
+        card.classList.add('ring-2', 'ring-indigo-500', 'shadow-md');
+      } else {
+        card.classList.remove('ring-2', 'ring-indigo-500', 'shadow-md');
+      }
+    });
 
-    // Top counts
-    const totalEl = document.getElementById('count-total');
-    if (totalEl) totalEl.textContent = counts.total;
-    const invEl = document.getElementById('count-invited');
-    if (invEl) invEl.textContent = counts.invited;
-    const pendEl = document.getElementById('count-pending');
-    if (pendEl) pendEl.textContent = counts.pending;
-    const decEl = document.getElementById('count-declined');
-    if (decEl) decEl.textContent = counts.declined;
+    document.querySelectorAll('.filter-status-pill').forEach(b => {
+      const f = b.getAttribute('data-filter');
+      if (f === this.activeFilter) {
+        b.classList.add('bg-slate-800', 'text-white', 'font-bold');
+        b.classList.remove('text-slate-400');
+      } else {
+        b.classList.remove('bg-slate-800', 'text-white', 'font-bold');
+        b.classList.add('text-slate-400');
+      }
+    });
+  }
+
+  render() {
+    const { categories, people } = store.getSnapshot();
+
+    // Gender & Category filtered scope for top metrics
+    const scopePeople = this.activeCategory === 'all'
+      ? people
+      : people.filter(p => p.category === this.activeCategory);
+
+    const getStat = (list) => ({
+      total: list.length,
+      f: list.filter(p => p.gender === 'F').length,
+      h: list.filter(p => p.gender === 'H').length
+    });
+
+    const sTotal = getStat(scopePeople);
+    const sInvited = getStat(scopePeople.filter(p => p.status === 'invited'));
+    const sPending = getStat(scopePeople.filter(p => p.status === 'pending'));
+    const sDeclined = getStat(scopePeople.filter(p => p.status === 'declined'));
+
+    const setElText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    // Update Top Counts with H/F breakdown
+    setElText('count-total', sTotal.total);
+    setElText('count-total-f', sTotal.f);
+    setElText('count-total-h', sTotal.h);
+
+    setElText('count-invited', sInvited.total);
+    setElText('count-invited-f', sInvited.f);
+    setElText('count-invited-h', sInvited.h);
+
+    setElText('count-pending', sPending.total);
+    setElText('count-pending-f', sPending.f);
+    setElText('count-pending-h', sPending.h);
+
+    setElText('count-declined', sDeclined.total);
+    setElText('count-declined-f', sDeclined.f);
+    setElText('count-declined-h', sDeclined.h);
+
+    this.updateStatCardActiveStyles();
 
     // Category pills badges
     const badgeAll = document.getElementById('cat-badge-all');
-    if (badgeAll) badgeAll.textContent = counts.total;
+    if (badgeAll) badgeAll.textContent = people.length;
     const badgeFam = document.getElementById('cat-badge-famille');
     if (badgeFam) badgeFam.textContent = categories['Famille'] || 0;
     const badgeBelle = document.getElementById('cat-badge-belle');
@@ -824,17 +1019,19 @@ class InvitationApp {
     if (badgeAmis) badgeAmis.textContent = categories['Amis'] || 0;
 
     // Gender counts (reflecting active category if not 'all', or global total)
-    const catPeople = this.activeCategory === 'all'
-      ? people
-      : people.filter(p => p.category === this.activeCategory);
-
     const gCountAll = document.getElementById('gender-count-all');
     const gCountF = document.getElementById('gender-count-f');
     const gCountH = document.getElementById('gender-count-h');
 
-    if (gCountAll) gCountAll.textContent = `(${catPeople.length})`;
-    if (gCountF) gCountF.textContent = `(${catPeople.filter(p => p.gender === 'F').length})`;
-    if (gCountH) gCountH.textContent = `(${catPeople.filter(p => p.gender === 'H').length})`;
+    if (gCountAll) gCountAll.textContent = `(${sTotal.total})`;
+    if (gCountF) gCountF.textContent = `(${sTotal.f})`;
+    if (gCountH) gCountH.textContent = `(${sTotal.h})`;
+
+    // Re-render stats modal if open
+    const statsModal = document.getElementById('stats-modal');
+    if (statsModal && !statsModal.classList.contains('hidden')) {
+      this.renderStatsModal();
+    }
 
     this.updateUserHeaderUI();
     this.updateViewModeUI();

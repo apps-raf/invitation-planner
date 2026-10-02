@@ -204,6 +204,50 @@ class Store {
     };
   }
 
+  getDetailedStats(category = 'all') {
+    const list = category === 'all' 
+      ? this.people 
+      : this.people.filter(p => p.category === category);
+
+    const sub = (status) => {
+      const items = status === 'total' ? list : list.filter(p => p.status === status);
+      return {
+        total: items.length,
+        f: items.filter(p => p.gender === 'F').length,
+        h: items.filter(p => p.gender === 'H').length
+      };
+    };
+
+    return {
+      total: sub('total'),
+      invited: sub('invited'),
+      pending: sub('pending'),
+      declined: sub('declined')
+    };
+  }
+
+  getAllCategoriesStats() {
+    const cats = ['Famille', 'Belle Famille', 'Voisins', 'Amis'];
+    return cats.map(cat => {
+      const list = this.people.filter(p => p.category === cat);
+      const sub = (status) => {
+        const items = status === 'total' ? list : list.filter(p => p.status === status);
+        return {
+          total: items.length,
+          f: items.filter(p => p.gender === 'F').length,
+          h: items.filter(p => p.gender === 'H').length
+        };
+      };
+      return {
+        category: cat,
+        total: sub('total'),
+        invited: sub('invited'),
+        pending: sub('pending'),
+        declined: sub('declined')
+      };
+    });
+  }
+
   getActiveManagerName() {
     const mgr = getCurrentManager();
     return mgr ? mgr.name : 'rafik';

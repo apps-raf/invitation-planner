@@ -55,6 +55,11 @@
         </div>
 
         <div class="flex items-center gap-1.5">
+          <!-- Stats Summary Modal Button -->
+          <button id="btn-open-stats" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-indigo-300 hover:text-indigo-200 flex items-center justify-center transition shadow-sm" title="Statistiques Détaillées (H/F)">
+            <span class="text-sm">📊</span>
+          </button>
+
           <!-- Journal / Historique Button (Admin only) -->
           <button id="btn-open-history" class="px-2 py-1 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-amber-300 hover:text-amber-200 hidden items-center gap-1 transition shadow-sm" title="Historique & Journal (Admin)">
             <span>📜</span>
@@ -81,24 +86,48 @@
         </div>
       </div>
 
-      <!-- Slim Metrics Bar (Compact Single Strip) -->
+      <!-- Metrics Bar with Gender Breakdown (Hommes & Femmes) -->
       <div class="grid grid-cols-4 gap-1 text-center text-xs">
-        <div class="bg-slate-900/90 border border-slate-800 rounded-lg py-1 px-1">
-          <span id="count-total" class="font-black text-white text-xs sm:text-sm">0</span>
-          <span class="text-[9px] text-slate-400 block leading-tight">Total</span>
-        </div>
-        <div class="bg-emerald-950/25 border border-emerald-500/25 rounded-lg py-1 px-1">
-          <span id="count-invited" class="font-black text-emerald-400 text-xs sm:text-sm">0</span>
-          <span class="text-[9px] text-emerald-300/80 block leading-tight">Invités</span>
-        </div>
-        <div class="bg-amber-950/25 border border-amber-500/25 rounded-lg py-1 px-1">
-          <span id="count-pending" class="font-black text-amber-400 text-xs sm:text-sm">0</span>
-          <span class="text-[9px] text-amber-300/80 block leading-tight">À décider</span>
-        </div>
-        <div class="bg-rose-950/25 border border-rose-500/25 rounded-lg py-1 px-1">
-          <span id="count-declined" class="font-black text-rose-400 text-xs sm:text-sm">0</span>
-          <span class="text-[9px] text-rose-300/80 block leading-tight">Écartés</span>
-        </div>
+        <button data-stat-status="all" class="stat-card bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-lg py-1 px-1 flex flex-col justify-between transition group text-center cursor-pointer">
+          <div>
+            <span id="count-total" class="font-black text-white text-xs sm:text-sm leading-none block">0</span>
+            <span class="text-[9px] text-slate-400 block leading-tight mt-0.5 font-medium">Total</span>
+          </div>
+          <div class="mt-1 pt-0.5 border-t border-slate-800/80 flex items-center justify-around text-[10px] leading-tight font-medium">
+            <span class="text-pink-300 flex items-center gap-0.5" title="Femmes total">👩<span id="count-total-f">0</span></span>
+            <span class="text-blue-300 flex items-center gap-0.5" title="Hommes total">👨<span id="count-total-h">0</span></span>
+          </div>
+        </button>
+        <button data-stat-status="invited" class="stat-card bg-emerald-950/25 border border-emerald-500/25 hover:border-emerald-500/40 rounded-lg py-1 px-1 flex flex-col justify-between transition group text-center cursor-pointer">
+          <div>
+            <span id="count-invited" class="font-black text-emerald-400 text-xs sm:text-sm leading-none block">0</span>
+            <span class="text-[9px] text-emerald-300/80 block leading-tight mt-0.5 font-medium">Invités</span>
+          </div>
+          <div class="mt-1 pt-0.5 border-t border-emerald-500/20 flex items-center justify-around text-[10px] leading-tight font-medium">
+            <span class="text-pink-300 flex items-center gap-0.5" title="Femmes invitées">👩<span id="count-invited-f">0</span></span>
+            <span class="text-blue-300 flex items-center gap-0.5" title="Hommes invités">👨<span id="count-invited-h">0</span></span>
+          </div>
+        </button>
+        <button data-stat-status="pending" class="stat-card bg-amber-950/25 border border-amber-500/25 hover:border-amber-500/40 rounded-lg py-1 px-1 flex flex-col justify-between transition group text-center cursor-pointer">
+          <div>
+            <span id="count-pending" class="font-black text-amber-400 text-xs sm:text-sm leading-none block">0</span>
+            <span class="text-[9px] text-amber-300/80 block leading-tight mt-0.5 font-medium">À décider</span>
+          </div>
+          <div class="mt-1 pt-0.5 border-t border-amber-500/20 flex items-center justify-around text-[10px] leading-tight font-medium">
+            <span class="text-pink-300 flex items-center gap-0.5" title="Femmes à décider">👩<span id="count-pending-f">0</span></span>
+            <span class="text-blue-300 flex items-center gap-0.5" title="Hommes à décider">👨<span id="count-pending-h">0</span></span>
+          </div>
+        </button>
+        <button data-stat-status="declined" class="stat-card bg-rose-950/25 border border-rose-500/25 hover:border-rose-500/40 rounded-lg py-1 px-1 flex flex-col justify-between transition group text-center cursor-pointer">
+          <div>
+            <span id="count-declined" class="font-black text-rose-400 text-xs sm:text-sm leading-none block">0</span>
+            <span class="text-[9px] text-rose-300/80 block leading-tight mt-0.5 font-medium">Écartés</span>
+          </div>
+          <div class="mt-1 pt-0.5 border-t border-rose-500/20 flex items-center justify-around text-[10px] leading-tight font-medium">
+            <span class="text-pink-300 flex items-center gap-0.5" title="Femmes écartées">👩<span id="count-declined-f">0</span></span>
+            <span class="text-blue-300 flex items-center gap-0.5" title="Hommes écartés">👨<span id="count-declined-h">0</span></span>
+          </div>
+        </button>
       </div>
 
       <!-- Search Bar -->
@@ -484,7 +513,25 @@
       <div id="history-list" class="space-y-2 overflow-y-auto flex-1 pr-1 scrollbar-thin">
         <div class="py-8 text-center text-xs text-slate-500">Chargement de l'historique...</div>
       </div>
+    </div>
+  </div>
 
+  <!-- Modal: Detailed Statistics & Breakdown (H/F) -->
+  <div id="stats-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg p-5 space-y-4 shadow-2xl animate-fade-in max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>📊 Statistiques Hommes & Femmes</span>
+          </h3>
+          <p class="text-[11px] text-slate-400">Total, Invités, À décider et Écartés</p>
+        </div>
+        <button id="btn-close-stats" class="text-slate-400 hover:text-white font-bold p-1">✕</button>
+      </div>
+
+      <div id="stats-modal-body" class="overflow-y-auto space-y-3 flex-1 pr-1 scrollbar-thin text-xs">
+        <!-- Rendered dynamically -->
+      </div>
     </div>
   </div>
 
