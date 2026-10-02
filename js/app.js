@@ -7,7 +7,7 @@ import { store } from './store.js';
 import {
   getCurrentManager,
   setCurrentManager,
-  verifyAndLogin,
+  loginWithPin,
   updateManagerPin,
   fetchAuditLogs,
   fetchManagers
@@ -25,7 +25,6 @@ class InvitationApp {
 
     // Auth & Manager state
     this.currentManager = getCurrentManager();
-    this.selectedAuthProfile = 'rafik';
     this.activeHistoryFilter = 'all';
 
     this.init();
@@ -97,7 +96,6 @@ class InvitationApp {
     stepChange?.classList.add('hidden');
     authModal?.classList.remove('hidden');
 
-    this.updateProfileSelectionUI();
     setTimeout(() => pinInput?.focus(), 150);
   }
 
@@ -127,37 +125,11 @@ class InvitationApp {
     setTimeout(() => newPinInput?.focus(), 150);
   }
 
-  updateProfileSelectionUI() {
-    document.querySelectorAll('.auth-profile-btn').forEach(btn => {
-      const p = btn.getAttribute('data-profile');
-      if (p === this.selectedAuthProfile) {
-        btn.classList.add('border-indigo-500', 'bg-indigo-600/10', 'text-white');
-        btn.classList.remove('border-slate-800', 'bg-slate-800/40', 'text-slate-400');
-      } else {
-        btn.classList.remove('border-indigo-500', 'bg-indigo-600/10', 'text-white');
-        btn.classList.add('border-slate-800', 'bg-slate-800/40', 'text-slate-400');
-      }
-    });
-  }
-
   bindAuthEvents() {
     const authModal = document.getElementById('auth-modal');
     const pinInput = document.getElementById('auth-pin-input');
     const btnSubmitLogin = document.getElementById('btn-submit-login');
     const errorEl = document.getElementById('auth-error-msg');
-
-    // Profile buttons toggle
-    document.querySelectorAll('.auth-profile-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.selectedAuthProfile = btn.getAttribute('data-profile') || 'rafik';
-        this.updateProfileSelectionUI();
-        if (pinInput) {
-          pinInput.value = '';
-          pinInput.focus();
-        }
-        if (errorEl) errorEl.classList.add('hidden');
-      });
-    });
 
     // Enter key submits PIN
     pinInput?.addEventListener('keydown', (e) => {
@@ -166,12 +138,20 @@ class InvitationApp {
       }
     });
 
-    // Submit PIN Login
+    // Auto-submit when 4 digits entered
+    pinInput?.addEventListener('input', () => {
+      if (errorEl) errorEl.classList.add('hidden');
+      if (pinInput.value.length === 4) {
+        btnSubmitLogin?.click();
+      }
+    });
+
+    // Submit PIN Login (Direct PIN authentication, no username required)
     btnSubmitLogin?.addEventListener('click', async () => {
       const pin = pinInput ? pinInput.value.trim() : '';
       if (!pin || pin.length !== 4) {
         if (errorEl) {
-          errorEl.textContent = 'Veuillez saisir un code à 4 chiffres';
+          errorEl.textContent = 'Veuillez saisir votre code à 4 chiffres';
           errorEl.classList.remove('hidden');
         }
         return;
@@ -180,7 +160,7 @@ class InvitationApp {
       btnSubmitLogin.disabled = true;
       btnSubmitLogin.innerHTML = '<span>Vérification...</span>';
 
-      const res = await verifyAndLogin(this.selectedAuthProfile, pin);
+      const res = await loginWithPin(pin);
       btnSubmitLogin.disabled = false;
       btnSubmitLogin.innerHTML = '<span>Déverrouiller</span><span>➜</span>';
 

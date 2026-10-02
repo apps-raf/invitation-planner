@@ -55,14 +55,48 @@ export async function fetchManagers() {
   return data || [];
 }
 
-export async function verifyAndLogin(managerName, pin) {
+export async function loginWithPin(pin) {
+  const sb = getSupabase();
+  if (!sb) return { success: false, message: 'Supabase non initialisé' };
+
+  if (!pin || pin.length !== 4) {
+    return { success: false, message: 'Veuillez saisir un code à 4 chiffres' };
+  }
+
+  const { data, error } = await sb
+    .from('managers')
+    .select('id, name, pin, role')
+    .eq('pin', pin);
+
+  if (error || !data || data.length === 0) {
+    return { success: false, message: 'Code PIN incorrect' };
+  }
+
+  const manager = data[0];
+  const mustChangePin = (pin === '0000');
+  const sessionData = {
+    id: manager.id,
+    name: manager.name,
+    role: manager.role,
+    mustChangePin
+  };
+
+  setCurrentManager(sessionData);
+  return { success: true, manager: sessionData, mustChangePin };
+}
+
+export async function verifyAndLogin(managerNameOrPin, pin) {
+  if (pin === undefined) {
+    return loginWithPin(managerNameOrPin);
+  }
+
   const sb = getSupabase();
   if (!sb) return { success: false, message: 'Supabase non initialisé' };
 
   const { data, error } = await sb
     .from('managers')
     .select('id, name, pin, role')
-    .eq('name', managerName)
+    .eq('name', managerNameOrPin)
     .single();
 
   if (error || !data) {
