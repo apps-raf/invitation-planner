@@ -1,25 +1,50 @@
 /**
- * InviTrack - Compact Mobile & Accurate Hierarchy (v4.2)
+ * InviTrack - Main Application
+ * Features: Multi-Manager Auth (PIN), Cloud Supabase Sync, Real-time Activity Log & 1-Click Undo
  */
 
 import { store } from './store.js';
+import {
+  getCurrentManager,
+  setCurrentManager,
+  verifyAndLogin,
+  updateManagerPin,
+  fetchAuditLogs,
+  fetchManagers
+} from './supabaseClient.js';
 
 class InvitationApp {
   constructor() {
     this.searchQuery = '';
     this.activeFilter = 'all'; // 'all', 'invited', 'pending', 'declined'
-    this.activeCategory = 'all'; // 'all', 'Famille', 'Voisins', 'Amis'
+    this.activeCategory = 'all'; // 'all', 'Famille', 'Belle Famille', 'Voisins', 'Amis'
     this.activeBranch = 'all'; // 'all' or specific branch name
     this.viewMode = store.config.viewMode || 'grouped'; // 'grouped' | 'flat'
     this.collapsedGroups = new Set();
     this.allCollapsed = false;
+
+    // Auth & Manager state
+    this.currentManager = getCurrentManager();
+    this.selectedAuthProfile = 'rafik';
+    this.activeHistoryFilter = 'all';
 
     this.init();
   }
 
   init() {
     this.bindEvents();
+    this.bindAuthEvents();
+    this.bindHistoryEvents();
+
     store.subscribe(() => this.render());
+    store.onAuditUpdate(() => {
+      const historyModal = document.getElementById('history-modal');
+      if (historyModal && !historyModal.classList.contains('hidden')) {
+        this.renderHistoryList();
+      }
+    });
+
+    this.checkInitialAuth();
     this.render();
     this.initPWA();
   }
@@ -29,6 +54,393 @@ class InvitationApp {
       navigator.serviceWorker.register('./sw.js').catch(console.error);
     }
   }
+
+  // --- Auth & PIN Handlers ---
+
+  checkInitialAuth() {
+    this.updateUserHeaderUI();
+    if (!this.currentManager) {
+      this.showLoginModal();
+    } else if (this.currentManager.mustChangePin) {
+      this.showChangePinModal(true);
+    }
+  }
+
+  updateUserHeaderUI() {
+    const nameEl = document.getElementById('header-user-name');
+    const dotEl = document.getElementById('cloud-status-dot');
+
+    if (this.currentManager) {
+      if (nameEl) nameEl.textContent = this.currentManager.name;
+    } else {
+      if (nameEl) nameEl.textContent = 'Connexion';
+    }
+
+    if (dotEl) {
+      dotEl.className = `absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full ${
+        store.cloudConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+      } ring-2 ring-slate-950`;
+      dotEl.title = store.cloudConnected ? 'Connecté à Supabase en direct' : 'Mode local / Connexion...';
+    }
+  }
+
+  showLoginModal() {
+    const authModal = document.getElementById('auth-modal');
+    const stepLogin = document.getElementById('auth-step-login');
+    const stepChange = document.getElementById('auth-step-changepin');
+    const pinInput = document.getElementById('auth-pin-input');
+    const errorEl = document.getElementById('auth-error-msg');
+
+    if (errorEl) errorEl.classList.add('hidden');
+    if (pinInput) pinInput.value = '';
+
+    stepLogin?.classList.remove('hidden');
+    stepChange?.classList.add('hidden');
+    authModal?.classList.remove('hidden');
+
+    this.updateProfileSelectionUI();
+    setTimeout(() => pinInput?.focus(), 150);
+  }
+
+  showChangePinModal(isMandatory = false) {
+    const authModal = document.getElementById('auth-modal');
+    const stepLogin = document.getElementById('auth-step-login');
+    const stepChange = document.getElementById('auth-step-changepin');
+    const newPinInput = document.getElementById('new-pin-input');
+    const confirmPinInput = document.getElementById('confirm-pin-input');
+    const errorEl = document.getElementById('changepin-error-msg');
+    const subtitle = document.getElementById('changepin-subtitle');
+
+    if (errorEl) errorEl.classList.add('hidden');
+    if (newPinInput) newPinInput.value = '';
+    if (confirmPinInput) confirmPinInput.value = '';
+
+    if (subtitle) {
+      subtitle.textContent = isMandatory
+        ? 'Première connexion détectée avec le code par défaut (0000). Veuillez définir votre code PIN secret à 4 chiffres.'
+        : 'Saisissez votre nouveau code PIN secret à 4 chiffres.';
+    }
+
+    stepLogin?.classList.add('hidden');
+    stepChange?.classList.remove('hidden');
+    authModal?.classList.remove('hidden');
+
+    setTimeout(() => newPinInput?.focus(), 150);
+  }
+
+  updateProfileSelectionUI() {
+    document.querySelectorAll('.auth-profile-btn').forEach(btn => {
+      const p = btn.getAttribute('data-profile');
+      if (p === this.selectedAuthProfile) {
+        btn.classList.add('border-indigo-500', 'bg-indigo-600/10', 'text-white');
+        btn.classList.remove('border-slate-800', 'bg-slate-800/40', 'text-slate-400');
+      } else {
+        btn.classList.remove('border-indigo-500', 'bg-indigo-600/10', 'text-white');
+        btn.classList.add('border-slate-800', 'bg-slate-800/40', 'text-slate-400');
+      }
+    });
+  }
+
+  bindAuthEvents() {
+    const authModal = document.getElementById('auth-modal');
+    const pinInput = document.getElementById('auth-pin-input');
+    const btnSubmitLogin = document.getElementById('btn-submit-login');
+    const errorEl = document.getElementById('auth-error-msg');
+
+    // Profile buttons toggle
+    document.querySelectorAll('.auth-profile-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.selectedAuthProfile = btn.getAttribute('data-profile') || 'rafik';
+        this.updateProfileSelectionUI();
+        if (pinInput) {
+          pinInput.value = '';
+          pinInput.focus();
+        }
+        if (errorEl) errorEl.classList.add('hidden');
+      });
+    });
+
+    // Enter key submits PIN
+    pinInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        btnSubmitLogin?.click();
+      }
+    });
+
+    // Submit PIN Login
+    btnSubmitLogin?.addEventListener('click', async () => {
+      const pin = pinInput ? pinInput.value.trim() : '';
+      if (!pin || pin.length !== 4) {
+        if (errorEl) {
+          errorEl.textContent = 'Veuillez saisir un code à 4 chiffres';
+          errorEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      btnSubmitLogin.disabled = true;
+      btnSubmitLogin.innerHTML = '<span>Vérification...</span>';
+
+      const res = await verifyAndLogin(this.selectedAuthProfile, pin);
+      btnSubmitLogin.disabled = false;
+      btnSubmitLogin.innerHTML = '<span>Déverrouiller</span><span>➜</span>';
+
+      if (!res.success) {
+        if (errorEl) {
+          errorEl.textContent = res.message || 'Code PIN incorrect';
+          errorEl.classList.remove('hidden');
+        }
+        if (pinInput) {
+          pinInput.value = '';
+          pinInput.focus();
+        }
+        return;
+      }
+
+      this.currentManager = res.manager;
+      this.updateUserHeaderUI();
+
+      if (res.mustChangePin) {
+        this.showChangePinModal(true);
+      } else {
+        authModal.classList.add('hidden');
+        this.showToast(`Bienvenue ${this.currentManager.name} !`, 'success');
+      }
+    });
+
+    // Save New PIN Handler
+    const btnSaveNewPin = document.getElementById('btn-save-new-pin');
+    const newPinInput = document.getElementById('new-pin-input');
+    const confirmPinInput = document.getElementById('confirm-pin-input');
+    const changepinError = document.getElementById('changepin-error-msg');
+
+    btnSaveNewPin?.addEventListener('click', async () => {
+      const newPin = newPinInput ? newPinInput.value.trim() : '';
+      const confirmPin = confirmPinInput ? confirmPinInput.value.trim() : '';
+
+      if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+        if (changepinError) {
+          changepinError.textContent = 'Le code doit contenir exactement 4 chiffres';
+          changepinError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (newPin === '0000') {
+        if (changepinError) {
+          changepinError.textContent = 'Le code 0000 est interdit. Choisissez un autre code.';
+          changepinError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (newPin !== confirmPin) {
+        if (changepinError) {
+          changepinError.textContent = 'Les deux codes ne correspondent pas';
+          changepinError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (!this.currentManager) return;
+
+      btnSaveNewPin.disabled = true;
+      btnSaveNewPin.textContent = 'Enregistrement...';
+
+      const res = await updateManagerPin(this.currentManager.id, newPin);
+      btnSaveNewPin.disabled = false;
+      btnSaveNewPin.textContent = 'Enregistrer et continuer';
+
+      if (!res.success) {
+        if (changepinError) {
+          changepinError.textContent = res.message || 'Erreur lors de la mise à jour';
+          changepinError.classList.remove('hidden');
+        }
+        return;
+      }
+
+      this.currentManager.mustChangePin = false;
+      authModal.classList.add('hidden');
+      this.showToast('Nouveau code PIN enregistré !', 'success');
+    });
+
+    // User Profile Menu Modal
+    const userModal = document.getElementById('user-modal');
+    document.getElementById('btn-user-profile')?.addEventListener('click', () => {
+      if (!this.currentManager) {
+        this.showLoginModal();
+        return;
+      }
+      document.getElementById('user-modal-name').textContent = this.currentManager.name;
+      userModal.classList.remove('hidden');
+    });
+
+    document.getElementById('btn-close-user')?.addEventListener('click', () => {
+      userModal.classList.add('hidden');
+    });
+
+    document.getElementById('btn-trigger-change-pin')?.addEventListener('click', () => {
+      userModal.classList.add('hidden');
+      this.showChangePinModal(false);
+    });
+
+    document.getElementById('btn-switch-user')?.addEventListener('click', () => {
+      userModal.classList.add('hidden');
+      setCurrentManager(null);
+      this.currentManager = null;
+      this.updateUserHeaderUI();
+      this.showLoginModal();
+    });
+  }
+
+  // --- History & Audit Log Handlers ---
+
+  bindHistoryEvents() {
+    const historyModal = document.getElementById('history-modal');
+    const btnOpenHistory = document.getElementById('btn-open-history');
+    const btnCloseHistory = document.getElementById('btn-close-history');
+
+    btnOpenHistory?.addEventListener('click', () => {
+      historyModal.classList.remove('hidden');
+      this.renderHistoryList();
+    });
+
+    btnCloseHistory?.addEventListener('click', () => {
+      historyModal.classList.add('hidden');
+    });
+
+    // Filter pills in history modal
+    document.querySelectorAll('.history-filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeHistoryFilter = btn.getAttribute('data-history-filter') || 'all';
+        document.querySelectorAll('.history-filter-pill').forEach(b => {
+          b.classList.remove('bg-amber-500/20', 'text-amber-300', 'font-bold', 'border', 'border-amber-500/30');
+          b.classList.add('text-slate-400');
+        });
+        btn.classList.add('bg-amber-500/20', 'text-amber-300', 'font-bold', 'border', 'border-amber-500/30');
+        btn.classList.remove('text-slate-400');
+        this.renderHistoryList();
+      });
+    });
+
+    // 1-Click Undo delegation
+    document.getElementById('history-list')?.addEventListener('click', async (e) => {
+      const btnUndo = e.target.closest('[data-action="undo-log"]');
+      if (!btnUndo) return;
+
+      const logId = btnUndo.getAttribute('data-log-id');
+      if (!logId) return;
+
+      btnUndo.disabled = true;
+      btnUndo.textContent = 'Annulation...';
+
+      const res = await store.undoAction(logId);
+      if (res.success) {
+        this.showToast(`↩ Modification de ${res.guestName} annulée !`, 'info');
+        this.renderHistoryList();
+      } else {
+        this.showToast(res.message || 'Impossible d\'annuler', 'error');
+        btnUndo.disabled = false;
+        btnUndo.textContent = '↩ Annuler';
+      }
+    });
+  }
+
+  async renderHistoryList() {
+    const container = document.getElementById('history-list');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="py-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+        <span>Chargement du journal Cloud...</span>
+      </div>
+    `;
+
+    const logs = await fetchAuditLogs(60);
+    const filteredLogs = logs.filter(log => {
+      if (this.activeHistoryFilter === 'all') return true;
+      return (log.manager_name || '').toLowerCase() === this.activeHistoryFilter.toLowerCase();
+    });
+
+    if (filteredLogs.length === 0) {
+      container.innerHTML = `
+        <div class="py-10 text-center text-xs text-slate-500">
+          Aucune modification enregistrée pour le moment.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filteredLogs.map(log => {
+      const isUndone = log.undone;
+      const date = new Date(log.created_at);
+      const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      const dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      const author = log.manager_name || 'Anonyme';
+
+      let actionDesc = '';
+      let actionBadge = '';
+
+      if (log.action_type === 'invited') {
+        actionBadge = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+        actionDesc = `A marqué <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong> comme <span class="text-emerald-400 font-semibold">Invité</span>`;
+      } else if (log.action_type === 'declined') {
+        actionBadge = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+        const reason = log.new_comment ? `(Motif: ${this.escapeHtml(log.new_comment)})` : '';
+        actionDesc = `A <span class="text-rose-400 font-semibold">écarté</span> <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong> ${reason}`;
+      } else if (log.action_type === 'pending') {
+        actionBadge = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+        actionDesc = `A remis <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong> à <span class="text-amber-400 font-semibold">À décider</span>`;
+      } else if (log.action_type === 'add') {
+        actionBadge = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+        actionDesc = `A <span class="text-indigo-400 font-semibold">ajouté</span> <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong>`;
+      } else if (log.action_type === 'delete') {
+        actionBadge = 'bg-slate-700 text-slate-300 border-slate-600';
+        actionDesc = `A supprimé <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong>`;
+      } else {
+        actionBadge = 'bg-slate-800 text-slate-400 border-slate-700';
+        actionDesc = `Action ${log.action_type} sur <strong class="text-white">${this.escapeHtml(log.guest_name)}</strong>`;
+      }
+
+      return `
+        <div class="p-2.5 rounded-xl border ${isUndone ? 'bg-slate-900/40 border-slate-800/50 opacity-60' : 'bg-slate-800/60 border-slate-700/60'} text-xs space-y-1 transition">
+          <div class="flex items-center justify-between gap-2">
+            <!-- Manager Badge + Timestamp -->
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold capitalize border ${actionBadge}">
+                👤 ${this.escapeHtml(author)}
+              </span>
+              <span class="text-[10px] text-slate-400 truncate">
+                ${dateStr} à ${timeStr}
+              </span>
+            </div>
+
+            <!-- Undo Button or Undone Indicator -->
+            <div class="shrink-0">
+              ${isUndone ? `
+                <span class="text-[10px] text-slate-500 italic line-through">
+                  Annulé par ${this.escapeHtml(log.undone_by || 'Gestionnaire')}
+                </span>
+              ` : `
+                <button data-action="undo-log" data-log-id="${log.id}" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition flex items-center gap-1">
+                  <span>↩</span>
+                  <span>Annuler</span>
+                </button>
+              `}
+            </div>
+          </div>
+
+          <!-- Action Description -->
+          <div class="text-[11px] text-slate-300 pl-0.5 leading-snug">
+            ${actionDesc}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // --- Main Events Binding ---
 
   bindEvents() {
     // Search input
@@ -59,7 +471,7 @@ class InvitationApp {
       this.renderList();
     });
 
-    // Category Tabs (Tous, Famille, Voisins, Amis)
+    // Category Tabs (Tous, Famille, Belle Famille, Voisins, Amis)
     document.querySelectorAll('.cat-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         this.activeCategory = btn.getAttribute('data-cat');
@@ -140,46 +552,53 @@ class InvitationApp {
       declineModal.classList.add('hidden');
     });
 
-    declineForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const comment = document.getElementById('decline-comment-input').value;
-      if (currentDeclineId) {
-        store.markDeclined(currentDeclineId, comment);
-        this.showToast('Marqué comme "Non invité"', 'info');
-      }
-      declineModal.classList.add('hidden');
-      declineForm.reset();
-    });
-
-    // Preset reasons
-    document.querySelectorAll('.preset-reason').forEach(tag => {
-      tag.addEventListener('click', () => {
-        document.getElementById('decline-comment-input').value = tag.getAttribute('data-reason');
+    document.querySelectorAll('.preset-reason').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById('decline-comment-input');
+        input.value = btn.getAttribute('data-reason') || '';
       });
     });
 
-    // Google Sheets Modal & Reset
-    const gsheetModal = document.getElementById('gsheet-modal');
-    document.getElementById('btn-open-gsheet')?.addEventListener('click', () => {
-      gsheetModal.classList.remove('hidden');
-    });
-    document.getElementById('btn-close-gsheet')?.addEventListener('click', () => {
-      gsheetModal.classList.add('hidden');
+    declineForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentDeclineId) return;
+      const comment = document.getElementById('decline-comment-input').value;
+      store.markDeclined(currentDeclineId, comment);
+      declineModal.classList.add('hidden');
+      this.showToast('Marqué comme écarté', 'warning');
     });
 
+    // Reset button in gsheet modal
     document.getElementById('btn-reset-list')?.addEventListener('click', () => {
-      if (confirm('Recharger la liste des 232 personnes du fichier d\'origine ?')) {
-        store.resetToInitialList();
-        this.showToast('Liste des 232 personnes rechargée !', 'success');
-        gsheetModal.classList.add('hidden');
+      if (confirm('Recharger la liste des 257 personnes du fichier d\'origine ?')) {
+        store.resetToDefault();
+        this.showToast('Liste des 257 personnes réinitialisée !', 'success');
       }
     });
 
-    // Delegated actions (Clicks on list items and headers)
+    // =========================================================================
+    // DELEGATED ACTIONS ON PEOPLE LIST
+    // NOTE: Batch invite MUST be checked FIRST to avoid being swallowed by toggle-group!
+    // =========================================================================
     document.getElementById('people-list')?.addEventListener('click', (e) => {
-      // Toggle collapse on branch header
+      // 1. Batch Invite entire branch (FIX: Handled BEFORE toggle-group!)
+      const batchInviteBtn = e.target.closest('[data-action="batch-invite"]');
+      if (batchInviteBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const idsStr = batchInviteBtn.getAttribute('data-ids');
+        const ids = idsStr ? idsStr.split(',').filter(Boolean) : [];
+        if (ids.length > 0) {
+          const count = store.markBatchInvited(ids);
+          this.showToast(`🟢 ${count} personnes de la branche invitées !`, 'success');
+        }
+        return;
+      }
+
+      // 2. Toggle collapse on branch header (ignore if clicked on button)
       const headerBtn = e.target.closest('[data-action="toggle-group"]');
       if (headerBtn) {
+        if (e.target.closest('button')) return;
         const groupKey = headerBtn.getAttribute('data-group-key');
         if (this.collapsedGroups.has(groupKey)) {
           this.collapsedGroups.delete(groupKey);
@@ -190,20 +609,7 @@ class InvitationApp {
         return;
       }
 
-      // Batch Invite entire branch
-      const batchInviteBtn = e.target.closest('[data-action="batch-invite"]');
-      if (batchInviteBtn) {
-        e.stopPropagation();
-        const idsStr = batchInviteBtn.getAttribute('data-ids');
-        const ids = idsStr ? idsStr.split(',') : [];
-        if (ids.length > 0) {
-          const count = store.markBatchInvited(ids);
-          this.showToast(`🟢 ${count} personnes de la branche marquées comme invitées !`, 'success');
-        }
-        return;
-      }
-
-      // 1-Click: Mark Invited
+      // 3. 1-Click: Mark Invited
       const btnInvite = e.target.closest('[data-action="mark-invited"]');
       if (btnInvite) {
         const id = btnInvite.getAttribute('data-id');
@@ -213,7 +619,7 @@ class InvitationApp {
         return;
       }
 
-      // Mark Declined (open modal)
+      // 4. Mark Declined (open modal)
       const btnDecline = e.target.closest('[data-action="open-decline"]');
       if (btnDecline) {
         currentDeclineId = btnDecline.getAttribute('data-id');
@@ -225,7 +631,7 @@ class InvitationApp {
         return;
       }
 
-      // Mark Pending
+      // 5. Mark Pending
       const btnPending = e.target.closest('[data-action="mark-pending"]');
       if (btnPending) {
         const id = btnPending.getAttribute('data-id');
@@ -234,7 +640,7 @@ class InvitationApp {
         return;
       }
 
-      // Quick Delete
+      // 6. Quick Delete
       const btnDelete = e.target.closest('[data-action="delete"]');
       if (btnDelete) {
         const id = btnDelete.getAttribute('data-id');
@@ -252,11 +658,11 @@ class InvitationApp {
     const icon = document.getElementById('view-mode-icon');
     const label = document.getElementById('view-mode-label');
     if (this.viewMode === 'grouped') {
-      icon.textContent = '📂';
-      label.textContent = 'Branches';
+      if (icon) icon.textContent = '📂';
+      if (label) label.textContent = 'Branches';
     } else {
-      icon.textContent = '📜';
-      label.textContent = 'Liste';
+      if (icon) icon.textContent = '📜';
+      if (label) label.textContent = 'Liste';
     }
   }
 
@@ -357,19 +763,28 @@ class InvitationApp {
     const { counts, categories } = store.getSnapshot();
 
     // Top counts
-    document.getElementById('count-total').textContent = counts.total;
-    document.getElementById('count-invited').textContent = counts.invited;
-    document.getElementById('count-pending').textContent = counts.pending;
-    document.getElementById('count-declined').textContent = counts.declined;
+    const totalEl = document.getElementById('count-total');
+    if (totalEl) totalEl.textContent = counts.total;
+    const invEl = document.getElementById('count-invited');
+    if (invEl) invEl.textContent = counts.invited;
+    const pendEl = document.getElementById('count-pending');
+    if (pendEl) pendEl.textContent = counts.pending;
+    const decEl = document.getElementById('count-declined');
+    if (decEl) decEl.textContent = counts.declined;
 
     // Category pills badges
-    document.getElementById('cat-badge-all').textContent = counts.total;
-    document.getElementById('cat-badge-famille').textContent = categories['Famille'] || 0;
-    const catBelleBadge = document.getElementById('cat-badge-belle');
-    if (catBelleBadge) catBelleBadge.textContent = categories['Belle Famille'] || 0;
-    document.getElementById('cat-badge-voisins').textContent = categories['Voisins'] || 0;
-    document.getElementById('cat-badge-amis').textContent = categories['Amis'] || 0;
+    const badgeAll = document.getElementById('cat-badge-all');
+    if (badgeAll) badgeAll.textContent = counts.total;
+    const badgeFam = document.getElementById('cat-badge-famille');
+    if (badgeFam) badgeFam.textContent = categories['Famille'] || 0;
+    const badgeBelle = document.getElementById('cat-badge-belle');
+    if (badgeBelle) badgeBelle.textContent = categories['Belle Famille'] || 0;
+    const badgeVoisins = document.getElementById('cat-badge-voisins');
+    if (badgeVoisins) badgeVoisins.textContent = categories['Voisins'] || 0;
+    const badgeAmis = document.getElementById('cat-badge-amis');
+    if (badgeAmis) badgeAmis.textContent = categories['Amis'] || 0;
 
+    this.updateUserHeaderUI();
     this.updateViewModeUI();
     this.renderBranchChips();
     this.renderList();
@@ -379,6 +794,8 @@ class InvitationApp {
     const filtered = this.getFilteredPeople();
     const container = document.getElementById('people-list');
     const query = this.searchQuery.trim();
+
+    if (!container) return;
 
     if (filtered.length === 0) {
       if (query) {
@@ -391,7 +808,7 @@ class InvitationApp {
           </div>
         `;
         document.getElementById('btn-quick-add-from-search')?.addEventListener('click', () => {
-          document.getElementById('btn-open-add').click();
+          document.getElementById('btn-open-add')?.click();
         });
       } else {
         container.innerHTML = `
@@ -452,14 +869,14 @@ class InvitationApp {
                     <span>✓ Tout inviter</span>
                   </button>
                 ` : `
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    Complet ✓
+                  <span class="px-2 py-0.5 rounded text-[10px] text-emerald-400 bg-emerald-500/10 font-bold border border-emerald-500/20">
+                    ✓ Tous invités
                   </span>
                 `}
               </div>
             </div>
 
-            <!-- Group Cards -->
+            <!-- Group Members list (if not collapsed) -->
             ${!isCollapsed ? `
               <div class="p-2 space-y-2 bg-slate-950/40">
                 ${members.map(person => this.renderPersonCard(person)).join('')}
@@ -470,33 +887,46 @@ class InvitationApp {
       }).join('');
 
     } else {
-      // 2. Flat Continuous View
-      container.innerHTML = filtered.map(person => this.renderPersonCard(person)).join('');
+      // 2. Flat List View
+      container.innerHTML = `
+        <div class="space-y-2">
+          ${filtered.map(person => this.renderPersonCard(person)).join('')}
+        </div>
+      `;
     }
   }
 
   renderPersonCard(person) {
     const isInvited = person.status === 'invited';
     const isDeclined = person.status === 'declined';
-    const isPending = !isInvited && !isDeclined;
+    const isPending = person.status === 'pending';
 
-    const dateStr = person.invitedAt ? new Date(person.invitedAt).toLocaleDateString('fr-FR', {
-      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-    }) : null;
+    let dateStr = '';
+    if (person.invitedAt) {
+      const d = new Date(person.invitedAt);
+      dateStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    }
+
+    let borderClass = 'border-slate-800/80';
+    let bgGlow = 'bg-slate-900/60';
+    if (isInvited) {
+      borderClass = 'border-emerald-500/30';
+      bgGlow = 'bg-emerald-950/10';
+    } else if (isDeclined) {
+      borderClass = 'border-rose-500/20';
+      bgGlow = 'bg-rose-950/10';
+    }
 
     return `
-      <div class="glass-card rounded-xl p-3 border transition ${
-        isInvited ? 'border-emerald-500/40 bg-emerald-950/20' :
-        isDeclined ? 'border-rose-500/20 bg-rose-950/15 opacity-75' :
-        'border-slate-800/80 bg-slate-900/60'
-      } flex flex-col gap-2">
-
-        <!-- Top Line: Name + Badges + Delete -->
-        <div class="flex items-start justify-between gap-1.5">
+      <div class="p-2.5 rounded-xl border ${borderClass} ${bgGlow} transition space-y-2">
+        <!-- Top Row: Name + Badges + Delete -->
+        <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <h4 class="font-bold text-white text-sm truncate">${this.escapeHtml(person.name)}</h4>
-              
+              <h4 class="font-bold text-xs sm:text-sm text-white truncate">
+                ${this.escapeHtml(person.name)}
+              </h4>
+
               <!-- Gender Badge -->
               ${person.gender ? `
                 <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold ${
