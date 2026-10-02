@@ -37,7 +37,7 @@
 
   <div class="w-full max-w-2xl min-h-screen flex flex-col pb-28 px-3.5 sm:px-6">
 
-    <!-- Top Sticky Bar: Metrics & Actions -->
+    <!-- Top Sticky Bar: Metrics & Controls -->
     <header class="sticky top-0 z-30 pt-3 pb-2 bg-slate-950/95 backdrop-blur-xl border-b border-slate-900 flex flex-col gap-2.5">
       <!-- Title & Controls -->
       <div class="flex items-center justify-between">
@@ -52,7 +52,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- View Mode Switcher: Grouped vs Flat -->
+          <!-- View Mode Switcher -->
           <button id="btn-toggle-view-mode" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition">
             <span id="view-mode-icon">📂</span>
             <span id="view-mode-label">Vue Branches</span>
@@ -90,8 +90,6 @@
         <div class="flex items-center gap-2 shrink-0">
           <span id="stat-famille" class="hover:text-white cursor-pointer transition">Famille: 0</span>
           <span>•</span>
-          <span id="stat-belle-famille" class="hover:text-white cursor-pointer transition">Belle Famille: 0</span>
-          <span>•</span>
           <span id="stat-voisins" class="hover:text-white cursor-pointer transition">Voisins: 0</span>
           <span>•</span>
           <span id="stat-amis" class="hover:text-white cursor-pointer transition">Amis: 0</span>
@@ -121,15 +119,11 @@
       <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
         <button data-cat="all" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-md transition shrink-0 flex items-center gap-1.5">
           <span>Tous</span>
-          <span id="cat-badge-all" class="text-[10px] opacity-80">257</span>
+          <span id="cat-badge-all" class="text-[10px] opacity-80">232</span>
         </button>
         <button data-cat="Famille" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
           <span>👨‍👩‍👧‍👦 Famille</span>
           <span id="cat-badge-famille" class="text-[10px] opacity-80">192</span>
-        </button>
-        <button data-cat="Belle Famille" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
-          <span>💍 Belle Famille</span>
-          <span id="cat-badge-belle" class="text-[10px] opacity-80">25</span>
         </button>
         <button data-cat="Voisins" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 text-slate-400 hover:text-white transition shrink-0 flex items-center gap-1.5">
           <span>🏡 Voisins</span>
@@ -192,7 +186,6 @@
             <label class="block text-xs font-semibold text-slate-300 mb-1">Catégorie</label>
             <select id="add-category-input" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
               <option value="Famille">Famille</option>
-              <option value="Belle Famille">Belle Famille</option>
               <option value="Amis">Amis</option>
               <option value="Voisins">Voisins</option>
             </select>
@@ -298,7 +291,7 @@
 
       <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
         <button id="btn-reset-list" class="text-amber-400 hover:text-amber-300 underline font-semibold">
-          Recharger les 257 personnes du fichier d'origine
+          Recharger les 232 personnes du fichier d'origine
         </button>
       </div>
     </div>

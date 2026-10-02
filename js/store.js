@@ -1,12 +1,12 @@
 /**
- * Streamlined Store for Invitation Tracking (v3 with Hierarchy & Bulk Actions)
+ * Streamlined Store for Invitation Tracking (v4 without Belle Famille)
  */
 
 import { GoogleSheetSync } from './googleSync.js';
 import { INITIAL_SPREADSHEET_PEOPLE } from './defaultPeople.js';
 
-const STORAGE_KEY_PEOPLE = 'invitrack_people_v3_hierarchical';
-const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v3';
+const STORAGE_KEY_PEOPLE = 'invitrack_people_v4';
+const STORAGE_KEY_CONFIG = 'invitrack_gsheet_config_v4';
 
 class Store {
   constructor() {
@@ -24,9 +24,10 @@ class Store {
       return [...INITIAL_SPREADSHEET_PEOPLE];
     }
     try {
-      const parsed = JSON.parse(raw);
-      // Auto-migrate if old structure without branches
-      if (parsed.length === 0 || !parsed[0].hasOwnProperty('branch')) {
+      let parsed = JSON.parse(raw);
+      // Strip any Belle Famille entries from previous storage
+      parsed = parsed.filter(p => p.category !== 'Belle Famille');
+      if (parsed.length === 0) {
         localStorage.setItem(STORAGE_KEY_PEOPLE, JSON.stringify(INITIAL_SPREADSHEET_PEOPLE));
         return [...INITIAL_SPREADSHEET_PEOPLE];
       }
@@ -44,7 +45,7 @@ class Store {
         endpointUrl: '',
         sheetCsvUrl: '',
         lastSync: null,
-        viewMode: 'grouped' // 'grouped' | 'flat'
+        viewMode: 'grouped'
       };
     }
     try {
@@ -90,12 +91,10 @@ class Store {
 
     const categories = {
       'Famille': this.people.filter(p => p.category === 'Famille').length,
-      'Belle Famille': this.people.filter(p => p.category === 'Belle Famille').length,
-      'Amis': this.people.filter(p => p.category === 'Amis').length,
-      'Voisins': this.people.filter(p => p.category === 'Voisins').length
+      'Voisins': this.people.filter(p => p.category === 'Voisins').length,
+      'Amis': this.people.filter(p => p.category === 'Amis').length
     };
 
-    // Calculate branches for Famille
     const branches = {};
     this.people.filter(p => p.category === 'Famille').forEach(p => {
       const b = p.branch || 'Autres membres';
@@ -186,7 +185,6 @@ class Store {
     return person;
   }
 
-  // Bulk / Batch actions (e.g. for an entire branch or family group)
   markBatchInvited(personIds) {
     if (!Array.isArray(personIds) || personIds.length === 0) return 0;
     const now = new Date().toISOString();

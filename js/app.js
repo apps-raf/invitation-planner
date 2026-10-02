@@ -356,7 +356,6 @@ class InvitationApp {
 
     // Secondary statistics
     document.getElementById('stat-famille').textContent = `Famille: ${categories['Famille'] || 0}`;
-    document.getElementById('stat-belle-famille').textContent = `Belle Famille: ${categories['Belle Famille'] || 0}`;
     document.getElementById('stat-voisins').textContent = `Voisins: ${categories['Voisins'] || 0}`;
     document.getElementById('stat-amis').textContent = `Amis: ${categories['Amis'] || 0}`;
     document.getElementById('stat-femmes').textContent = `👩 ${counts.femmes} F`;
@@ -365,7 +364,6 @@ class InvitationApp {
     // Category pills badges
     document.getElementById('cat-badge-all').textContent = counts.total;
     document.getElementById('cat-badge-famille').textContent = categories['Famille'] || 0;
-    document.getElementById('cat-badge-belle').textContent = categories['Belle Famille'] || 0;
     document.getElementById('cat-badge-voisins').textContent = categories['Voisins'] || 0;
     document.getElementById('cat-badge-amis').textContent = categories['Amis'] || 0;
 
@@ -414,8 +412,6 @@ class InvitationApp {
         if (p.category === 'Famille') {
           groupTitle = p.branch ? `Branche ${p.branch}` : 'Famille Ourahmoune (Autres membres)';
           groupType = 'branch';
-        } else if (p.category === 'Belle Famille') {
-          groupTitle = 'Belle Famille (Izri)';
         } else if (p.category === 'Voisins') {
           groupTitle = 'Voisins';
         } else if (p.category === 'Amis') {
