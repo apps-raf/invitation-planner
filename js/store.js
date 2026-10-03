@@ -198,19 +198,12 @@ class Store {
       branches[b] = (branches[b] || 0) + 1;
     });
 
-    const amisRafikBranches = {};
-    this.people.filter(p => p.category === 'Amis Rafik').forEach(p => {
-      const b = p.branch || 'Autres';
-      amisRafikBranches[b] = (amisRafikBranches[b] || 0) + 1;
-    });
-
     return {
       people: this.people,
       counts,
       categories,
       branches,
       familleFamilies,
-      amisRafikBranches,
       config: this.config,
       isSyncing: this.isSyncing,
       cloudConnected: this.cloudConnected

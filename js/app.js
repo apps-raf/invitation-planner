@@ -876,7 +876,7 @@ class InvitationApp {
     } else if (p.category === 'Amis') {
       return p.familyName ? `Amis (${p.familyName})` : 'Amis';
     } else if (p.category === 'Amis Rafik') {
-      return p.branch ? `Amis Rafik (${p.branch})` : 'Amis Rafik';
+      return 'Amis Rafik';
     }
     return p.category;
   }
@@ -925,7 +925,7 @@ class InvitationApp {
     const container = document.getElementById('branch-chips-container');
     if (!container) return;
 
-    const { familleFamilies, amisRafikBranches, people } = store.getSnapshot();
+    const { familleFamilies, people } = store.getSnapshot();
 
     if (this.activeCategory === 'Famille') {
       container.classList.remove('hidden');
@@ -948,26 +948,6 @@ class InvitationApp {
             this.activeBranch === fam ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
           }">
             ${this.escapeHtml(fam)} (${count})
-          </button>
-        `).join('')}
-      `;
-    } else if (this.activeCategory === 'Amis Rafik') {
-      container.classList.remove('hidden');
-      const branchEntries = Object.entries(amisRafikBranches || {}).sort((a, b) => b[1] - a[1]);
-      const rafikCount = people.filter(p => p.category === 'Amis Rafik').length;
-
-      container.innerHTML = `
-        <span class="text-[10px] font-semibold text-slate-500 shrink-0 self-center mr-0.5">Groupes:</span>
-        <button data-branch="all" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-bold transition shrink-0 ${
-          this.activeBranch === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
-        }">
-          Tous (${rafikCount})
-        </button>
-        ${branchEntries.map(([branch, count]) => `
-          <button data-branch="${this.escapeAttr(branch)}" class="branch-chip px-2 py-0.5 rounded-md text-[11px] font-medium transition shrink-0 ${
-            this.activeBranch === branch ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white'
-          }">
-            ${this.escapeHtml(branch)} (${count})
           </button>
         `).join('')}
       `;
